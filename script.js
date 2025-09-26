@@ -217,6 +217,53 @@ function isHarvestSeason(cropType) {
     return cropData[cropType].harvestSeason.includes(currentGameDate.month);
 }
 
+// Checklist logic and helpers
+
+// Crops that leave stubble for mulching
+const stubbleCrops = [
+    'Barley', 'Wheat', 'Oats', 'Canola', 'Sorghum', 'Corn'
+];
+
+// Checklist definitions
+const checklistTemplate = [
+    { key: 'mulching', label: 'Mulching (2.5% yield)', info: 'Only crops that leave stubble', stubbleOnly: true },
+    { key: 'liming', label: 'Liming (15% yield)', info: 'Needed every 3 harvests, decreases 5% every harvest', every3: true },
+    { key: 'fertilize1', label: 'Fertilize (first run 22.5%)', info: '' },
+    { key: 'plow', label: 'Plow (15% yield)', info: 'Needed every 3 harvests, decreases 5% every harvest', every3: true },
+    { key: 'stone', label: 'Stone removal', info: 'No effect on yield, but on equipment wear' },
+    { key: 'cultivate', label: 'Cultivate', info: '' },
+    { key: 'seed', label: 'Seed', info: '' },
+    { key: 'rolling', label: 'Rolling (2.5% yield)', info: 'Must be right after planting for bonus' },
+    { key: 'fertilize2', label: 'Fertilize (second run 22.5%)', info: '' },
+    { key: 'weed', label: 'Weed work (+20%)', info: '' }
+];
+
+// Helper to get checklist for a field
+function getChecklistForField(field) {
+    const isStubble = stubbleCrops.includes(field.cropType);
+    return checklistTemplate.map(item => ({
+        key: item.key,
+        label: item.label,
+        info: item.info,
+        stubbleOnly: !!item.stubbleOnly,
+        every3: !!item.every3,
+        checked: field.checklist?.find(c => c.key === item.key)?.checked || false,
+        disabled: (item.stubbleOnly && !isStubble)
+    }));
+}
+
+// Checklist toggle handler
+function toggleChecklist(fieldId, key) {
+    const field = fields.find(f => f.id === fieldId);
+    if (!field) return;
+    if (!field.checklist) field.checklist = getChecklistForField(field);
+    const item = field.checklist.find(c => c.key === key);
+    if (!item || item.disabled) return;
+    item.checked = !item.checked;
+    saveData();
+    updateFieldsList();
+}
+
 // Game Settings Functions
 function onDaysPerMonthChange() {
     const input = document.getElementById('days-per-month');

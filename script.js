@@ -1,38 +1,183 @@
 /**
- * Farming Simulator 25 Crop Calculator
- * A professional crop growth tracking application
+ * Farming Simulator 25 In-Game Crop Calculator
+ * Uses FS25's in-game calendar system
  */
 
 // ========================================
-// CROP DATA CONFIGURATION
+// FS25 GAME CALENDAR SYSTEM
+// ========================================
+
+// Current game date (Day, Month, Year)
+let currentGameDate = {
+    day: 3,
+    month: 10, // October
+    year: 1
+};
+
+// Month names
+const monthNames = {
+    1: 'January', 2: 'February', 3: 'March', 4: 'April',
+    5: 'May', 6: 'June', 7: 'July', 8: 'August', 
+    9: 'September', 10: 'October', 11: 'November', 12: 'December'
+};
+
+// Season mapping
+const seasons = {
+    3: 'Spring', 4: 'Spring', 5: 'Spring',
+    6: 'Summer', 7: 'Summer', 8: 'Summer',
+    9: 'Fall', 10: 'Fall', 11: 'Fall',
+    12: 'Winter', 1: 'Winter', 2: 'Winter'
+};
+
+// ========================================
+// CROP DATA WITH FS25 SEASONS
 // ========================================
 
 const cropData = {
-    'Wheat': { growthTime: 7, color: '#F59E0B' },
-    'Barley': { growthTime: 7, color: '#F59E0B' },
-    'Canola': { growthTime: 8, color: '#EAB308' },
-    'Oats': { growthTime: 9, color: '#84CC16' },
-    'Corn': { growthTime: 6, color: '#22D3EE' },
-    'Sunflowers': { growthTime: 7, color: '#F59E0B' },
-    'Soybeans': { growthTime: 6, color: '#22D3EE' },
-    'Potatoes': { growthTime: 5, color: '#10B981' },
-    'Rice': { growthTime: 4, color: '#06B6D4' },
-    'Long Grain Rice': { growthTime: 5, color: '#10B981' },
-    'Sugar Beet': { growthTime: 7, color: '#F59E0B' },
-    'Sugarcane': { growthTime: 7, color: '#F59E0B' },
-    'Cotton': { growthTime: 8, color: '#EAB308' },
-    'Sorghum': { growthTime: 4, color: '#06B6D4' },
-    'Grapes': { growthTime: 5, color: '#10B981' },
-    'Olives': { growthTime: 4, color: '#06B6D4' },
-    'Poplar': { growthTime: 12, color: '#DC2626' },
-    'Red Beet': { growthTime: 4, color: '#06B6D4' },
-    'Carrots': { growthTime: 4, color: '#06B6D4' },
-    'Parsnips': { growthTime: 4, color: '#06B6D4' },
-    'Green Beans': { growthTime: 4, color: '#06B6D4' },
-    'Peas': { growthTime: 4, color: '#06B6D4' },
-    'Spinach': { growthTime: 3, color: '#10B981' },
-    'Grass': { growthTime: 2.5, color: '#22C55E' },
-    'Oilseed Radish': { growthTime: 1, color: '#22C55E' }
+    'Barley': { 
+        growthTime: 4, // months in-game
+        plantingSeason: [9, 10], // Sep-Oct
+        harvestSeason: [6, 7], // Jun-Jul
+        icon: '🌾'
+    },
+    'Canola': {
+        growthTime: 10,
+        plantingSeason: [7, 8, 9], // Jul-Sep
+        harvestSeason: [6, 7, 8], // Jun-Aug
+        icon: '🌻'
+    },
+    'Carrots': {
+        growthTime: 5,
+        plantingSeason: [4, 5, 6], // Apr-Jun
+        harvestSeason: [8, 9, 10, 11], // Aug-Nov
+        icon: '🥕'
+    },
+    'Corn': {
+        growthTime: 6,
+        plantingSeason: [3, 4, 5], // Mar-May
+        harvestSeason: [10, 11], // Oct-Nov
+        icon: '🌽'
+    },
+    'Cotton': {
+        growthTime: 8,
+        plantingSeason: [3], // Mar
+        harvestSeason: [10, 11, 2], // Oct-Nov, Feb
+        icon: '☁️'
+    },
+    'Grapes': {
+        growthTime: 6,
+        plantingSeason: [3, 4, 5], // Mar-May
+        harvestSeason: [9, 10], // Sep-Oct
+        icon: '🍇'
+    },
+    'Grass': {
+        growthTime: 4,
+        plantingSeason: [3, 4, 5, 6, 7, 8, 9], // Mar-Sep
+        harvestSeason: [5, 6, 7, 8, 9, 10, 11, 12, 1, 2], // May-Feb
+        icon: '🌱'
+    },
+    'Green Beans': {
+        growthTime: 4,
+        plantingSeason: [4, 5, 6], // Apr-Jun
+        harvestSeason: [8, 9, 10, 11], // Aug-Nov
+        icon: '🫘'
+    },
+    'Long Grain Rice': {
+        growthTime: 5,
+        plantingSeason: [3, 4], // Mar-Apr
+        harvestSeason: [8, 9], // Aug-Sep
+        icon: '🌾'
+    },
+    'Oats': {
+        growthTime: 5,
+        plantingSeason: [3, 4, 5], // Mar-May
+        harvestSeason: [7, 8], // Jul-Aug
+        icon: '🌾'
+    },
+    'Oilseed Radish': {
+        growthTime: 12,
+        plantingSeason: [3, 4, 5, 6, 7, 8, 9, 10, 11], // Mar-Nov
+        harvestSeason: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2], // All year
+        icon: '🌱'
+    },
+    'Olives': {
+        growthTime: 4,
+        plantingSeason: [3, 4, 5, 6], // Mar-Jun
+        harvestSeason: [9, 10], // Sep-Oct
+        icon: '🫒'
+    },
+    'Parsnips': {
+        growthTime: 6,
+        plantingSeason: [4, 5, 6], // Apr-Jun
+        harvestSeason: [8, 9, 10, 11], // Aug-Nov
+        icon: '🥕'
+    },
+    'Peas': {
+        growthTime: 4,
+        plantingSeason: [3, 4, 5], // Mar-May
+        harvestSeason: [7, 8, 9], // Jul-Sep
+        icon: '🫛'
+    },
+    'Poplar': {
+        growthTime: 12,
+        plantingSeason: [3, 4, 5, 6, 7, 8], // Mar-Aug
+        harvestSeason: [9, 10, 11, 12, 1, 2], // Sep-Feb
+        icon: '🌳'
+    },
+    'Potatoes': {
+        growthTime: 5,
+        plantingSeason: [3, 4, 5], // Mar-May
+        harvestSeason: [8, 9], // Aug-Sep
+        icon: '🥔'
+    },
+    'Red Beet': {
+        growthTime: 6,
+        plantingSeason: [4, 5, 6], // Apr-Jun
+        harvestSeason: [8, 9, 10, 11], // Aug-Nov
+        icon: '🍠'
+    },
+    'Rice': {
+        growthTime: 5,
+        plantingSeason: [4, 5], // Apr-May
+        harvestSeason: [8, 9], // Aug-Sep
+        icon: '🌾'
+    },
+    'Sorghum': {
+        growthTime: 5,
+        plantingSeason: [4, 5], // Apr-May
+        harvestSeason: [8, 9], // Aug-Sep
+        icon: '🌾'
+    },
+    'Soybeans': {
+        growthTime: 6,
+        plantingSeason: [4, 5], // Apr-May
+        harvestSeason: [9, 10], // Sep-Oct
+        icon: '🫘'
+    },
+    'Spinach': {
+        growthTime: 7,
+        plantingSeason: [4, 5, 6], // Apr-Jun
+        harvestSeason: [8, 9, 10, 11], // Aug-Nov
+        icon: '🥬'
+    },
+    'Sugar Beet': {
+        growthTime: 6,
+        plantingSeason: [3, 4], // Mar-Apr
+        harvestSeason: [9, 10, 11], // Sep-Nov
+        icon: '🍠'
+    },
+    'Sunflowers': {
+        growthTime: 6,
+        plantingSeason: [4, 5], // Apr-May
+        harvestSeason: [10, 11], // Oct-Nov
+        icon: '🌻'
+    },
+    'Wheat': {
+        growthTime: 9,
+        plantingSeason: [8, 9], // Aug-Sep
+        harvestSeason: [6, 7], // Jun-Jul
+        icon: '🌾'
+    }
 };
 
 // ========================================
@@ -42,254 +187,60 @@ const cropData = {
 let fields = [];
 
 // ========================================
-// UTILITY FUNCTIONS
+// GAME DATE FUNCTIONS
 // ========================================
 
 /**
- * Calculate harvest date based on plant date and crop type
- * @param {string} plantDateString - ISO date string
- * @param {string} cropType - Crop type key
- * @returns {Date} Calculated harvest date
+ * Convert game date to total days for calculations
  */
-function calculateHarvestDate(plantDateString, cropType) {
-    const plantDate = new Date(plantDateString);
-    const growthTime = cropData[cropType]?.growthTime || 0;
-    const harvestDate = new Date(plantDate);
-    harvestDate.setMonth(harvestDate.getMonth() + growthTime);
-    return harvestDate;
+function gameDataToDays(day, month, year) {
+    return (year - 1) * 336 + ((month - 1) * 28) + (day - 1);
+}
+
+/**
+ * Convert total days back to game date
+ */
+function daysToGameDate(totalDays) {
+    const year = Math.floor(totalDays / 336) + 1;
+    const remainingDays = totalDays % 336;
+    const month = Math.floor(remainingDays / 28) + 1;
+    const day = (remainingDays % 28) + 1;
+    return { day, month, year };
+}
+
+/**
+ * Calculate harvest date based on plant date and crop growth time
+ */
+function calculateHarvestDate(plantDay, plantMonth, cropType) {
+    const plantTotalDays = gameDataToDays(plantDay, plantMonth, currentGameDate.year);
+    const growthTimeInDays = cropData[cropType].growthTime * 28; // 28 days per month
+    const harvestTotalDays = plantTotalDays + growthTimeInDays;
+    return daysToGameDate(harvestTotalDays);
 }
 
 /**
  * Calculate days remaining until harvest
- * @param {Date} harvestDate - Target harvest date
- * @returns {number} Days remaining (negative if overdue)
  */
-function getTimeRemaining(harvestDate) {
-    const now = new Date();
-    const timeDiff = harvestDate.getTime() - now.getTime();
-    return Math.ceil(timeDiff / (1000 * 3600 * 24));
+function getGameDaysRemaining(harvestDate) {
+    const currentTotalDays = gameDataToDays(currentGameDate.day, currentGameDate.month, currentGameDate.year);
+    const harvestTotalDays = gameDataToDays(harvestDate.day, harvestDate.month, harvestDate.year);
+    return harvestTotalDays - currentTotalDays;
 }
 
 /**
- * Get status color based on days remaining
- * @param {number} daysRemaining - Days until harvest
- * @returns {string} CSS class name for status color
+ * Check if current date is in planting season for crop
  */
-function getStatusColor(daysRemaining) {
-    if (daysRemaining < 0) return 'bg-green-500';
-    if (daysRemaining <= 7) return 'bg-yellow-500';
-    if (daysRemaining <= 30) return 'bg-orange-500';
-    return 'bg-blue-500';
+function isPlantingSeason(cropType) {
+    const plantingSeasons = cropData[cropType].plantingSeason;
+    return plantingSeasons.includes(currentGameDate.month);
 }
 
 /**
- * Get human-readable status text
- * @param {number} daysRemaining - Days until harvest
- * @returns {string} Status message
+ * Check if current date is in harvest season for crop
  */
-function getStatusText(daysRemaining) {
-    if (daysRemaining < 0) return 'Ready to Harvest!';
-    if (daysRemaining === 0) return 'Harvest Today!';
-    if (daysRemaining === 1) return '1 day remaining';
-    return `${daysRemaining} days remaining`;
-}
-
-/**
- * Format date for display
- * @param {Date} date - Date to format
- * @returns {string} Formatted date string
- */
-function formatDate(date) {
-    return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-}
-
-/**
- * Generate CSS class name from crop type
- * @param {string} cropType - Crop type name
- * @returns {string} CSS class name
- */
-function getCropClass(cropType) {
-    return 'crop-' + cropType.toLowerCase().replace(/\s+/g, '');
-}
-
-// ========================================
-// DATA PERSISTENCE
-// ========================================
-
-/**
- * Load fields from localStorage
- */
-function loadFields() {
-    try {
-        const saved = localStorage.getItem('farmingFields');
-        if (saved) {
-            fields = JSON.parse(saved).map(field => ({
-                ...field,
-                plantDate: new Date(field.plantDate),
-                harvestDate: new Date(field.harvestDate)
-            }));
-        }
-    } catch (error) {
-        console.error('Error loading fields from localStorage:', error);
-        fields = [];
-    }
-}
-
-/**
- * Save fields to localStorage
- */
-function saveFields() {
-    try {
-        localStorage.setItem('farmingFields', JSON.stringify(fields));
-    } catch (error) {
-        console.error('Error saving fields to localStorage:', error);
-    }
-}
-
-// ========================================
-// UI INITIALIZATION
-// ========================================
-
-/**
- * Populate crop type dropdown
- */
-function populateCropSelect() {
-    const select = document.getElementById('crop-type');
-    const sortedCrops = Object.keys(cropData).sort();
-    
-    // Clear existing options except the first one
-    select.innerHTML = '<option value="">Select a crop</option>';
-    
-    sortedCrops.forEach(crop => {
-        const option = document.createElement('option');
-        option.value = crop;
-        option.textContent = `${crop} (${cropData[crop].growthTime} months)`;
-        select.appendChild(option);
-    });
-}
-
-/**
- * Populate crop reference guide
- */
-function populateCropReference() {
-    const container = document.getElementById('crop-reference');
-    const sortedCrops = Object.keys(cropData).sort();
-    
-    container.innerHTML = '';
-    
-    sortedCrops.forEach(crop => {
-        const div = document.createElement('div');
-        div.className = 'text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors';
-        div.innerHTML = `
-            <div class="text-sm font-medium text-gray-900 mb-1">${crop}</div>
-            <div class="text-xs text-gray-600">
-                ${cropData[crop].growthTime} ${cropData[crop].growthTime === 1 ? 'month' : 'months'}
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
-
-// ========================================
-// MODAL FUNCTIONS
-// ========================================
-
-/**
- * Show the add field modal
- */
-function showAddForm() {
-    const modal = document.getElementById('add-field-modal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    
-    // Set today's date as default
-    document.getElementById('plant-date').value = new Date().toISOString().split('T')[0];
-    
-    // Focus on field name input
-    document.getElementById('field-name').focus();
-}
-
-/**
- * Hide the add field modal
- */
-function hideAddForm() {
-    const modal = document.getElementById('add-field-modal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    
-    // Reset form
-    document.getElementById('add-field-form').reset();
-}
-
-// ========================================
-// FIELD MANAGEMENT
-// ========================================
-
-/**
- * Add a new field
- */
-function addField() {
-    const fieldName = document.getElementById('field-name').value.trim();
-    const cropType = document.getElementById('crop-type').value;
-    const plantDateValue = document.getElementById('plant-date').value;
-    const notes = document.getElementById('notes').value.trim();
-
-    // Validation
-    if (!fieldName || !cropType || !plantDateValue) {
-        alert('Please fill in all required fields (Field Name, Crop Type, and Plant Date).');
-        return;
-    }
-
-    const plantDate = new Date(plantDateValue);
-    
-    // Check if date is valid
-    if (isNaN(plantDate.getTime())) {
-        alert('Please enter a valid plant date.');
-        return;
-    }
-
-    // Check if field name already exists
-    if (fields.some(field => field.fieldName.toLowerCase() === fieldName.toLowerCase())) {
-        alert('A field with this name already exists. Please choose a different name.');
-        return;
-    }
-
-    const harvestDate = calculateHarvestDate(plantDateValue, cropType);
-
-    const field = {
-        id: Date.now(),
-        fieldName,
-        cropType,
-        plantDate,
-        harvestDate,
-        notes
-    };
-
-    fields.push(field);
-    saveFields();
-    updateDisplay();
-    hideAddForm();
-    
-    // Show success message
-    showNotification(`Field "${fieldName}" added successfully!`, 'success');
-}
-
-/**
- * Remove a field
- * @param {number} id - Field ID to remove
- */
-function removeField(id) {
-    const field = fields.find(f => f.id === id);
-    if (field && confirm(`Are you sure you want to remove "${field.fieldName}"?`)) {
-        fields = fields.filter(field => field.id !== id);
-        saveFields();
-        updateDisplay();
-        showNotification(`Field "${field.fieldName}" removed.`, 'info');
-    }
+function isHarvestSeason(cropType) {
+    const harvestSeasons = cropData[cropType].harvestSeason;
+    return harvestSeasons.includes(currentGameDate.month);
 }
 
 // ========================================
@@ -297,33 +248,71 @@ function removeField(id) {
 // ========================================
 
 /**
- * Update all UI elements
+ * Update the current game date display
  */
-function updateDisplay() {
-    updateSummaryCards();
-    updateFieldsList();
+function updateGameDateDisplay() {
+    const dateStr = `Day ${currentGameDate.day}, ${monthNames[currentGameDate.month]}, Year ${currentGameDate.year}`;
+    document.getElementById('current-game-date').textContent = dateStr;
+    document.getElementById('current-season').textContent = seasons[currentGameDate.month];
 }
 
 /**
- * Update summary statistics cards
+ * Update planting recommendations
+ */
+function updatePlantingRecommendations() {
+    const container = document.getElementById('planting-recommendations');
+    const canPlant = Object.keys(cropData).filter(isPlantingSeason);
+    
+    if (canPlant.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">No crops recommended for planting this month.</p>';
+        return;
+    }
+    
+    container.innerHTML = canPlant.map(crop => `
+        <div class="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
+            <span class="text-lg">${cropData[crop].icon}</span>
+            <span class="font-medium">${crop}</span>
+            <span class="text-sm text-gray-600">(${cropData[crop].growthTime} months)</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * Update harvest recommendations
+ */
+function updateHarvestRecommendations() {
+    const container = document.getElementById('harvest-recommendations');
+    const canHarvest = Object.keys(cropData).filter(isHarvestSeason);
+    
+    if (canHarvest.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">No crops in harvest season this month.</p>';
+        return;
+    }
+    
+    container.innerHTML = canHarvest.map(crop => `
+        <div class="flex items-center space-x-2 p-2 bg-orange-50 rounded-lg">
+            <span class="text-lg">${cropData[crop].icon}</span>
+            <span class="font-medium">${crop}</span>
+            <span class="text-sm text-gray-600">Harvest season</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * Update summary statistics
  */
 function updateSummaryCards() {
     const totalFields = fields.length;
-    const readyHarvest = fields.filter(f => getTimeRemaining(f.harvestDate) <= 0).length;
-    const harvestSoon = fields.filter(f => {
-        const days = getTimeRemaining(f.harvestDate);
-        return days > 0 && days <= 7;
-    }).length;
-    const growing = fields.filter(f => getTimeRemaining(f.harvestDate) > 7).length;
+    const readyHarvest = fields.filter(f => getGameDaysRemaining(f.harvestDate) <= 0).length;
+    const growing = totalFields - readyHarvest;
 
     document.getElementById('total-fields').textContent = totalFields;
     document.getElementById('ready-harvest').textContent = readyHarvest;
-    document.getElementById('harvest-soon').textContent = harvestSoon;
     document.getElementById('growing').textContent = growing;
 }
 
 /**
- * Update the fields list display
+ * Update fields list
  */
 function updateFieldsList() {
     const container = document.getElementById('fields-container');
@@ -336,42 +325,37 @@ function updateFieldsList() {
 
     emptyState.style.display = 'none';
 
-    // Sort fields by harvest readiness
+    // Sort by days remaining
     const sortedFields = [...fields].sort((a, b) => {
-        const aDays = getTimeRemaining(a.harvestDate);
-        const bDays = getTimeRemaining(b.harvestDate);
-        if (aDays < 0 && bDays >= 0) return -1;
-        if (bDays < 0 && aDays >= 0) return 1;
-        return aDays - bDays;
+        return getGameDaysRemaining(a.harvestDate) - getGameDaysRemaining(b.harvestDate);
     });
 
-    // Generate HTML for fields
     const fieldsHTML = sortedFields.map(field => {
-        const daysRemaining = getTimeRemaining(field.harvestDate);
-        const statusColor = getStatusColor(daysRemaining);
-        const statusText = getStatusText(daysRemaining);
-        const cropClass = getCropClass(field.cropType);
-        const readyClass = daysRemaining <= 0 ? 'ready-harvest' : '';
+        const daysRemaining = getGameDaysRemaining(field.harvestDate);
+        const statusColor = daysRemaining <= 0 ? 'bg-green-500' : 
+                           daysRemaining <= 28 ? 'bg-yellow-500' : 'bg-blue-500';
+        const statusText = daysRemaining <= 0 ? 'Ready to Harvest!' :
+                          daysRemaining === 1 ? '1 day remaining' :
+                          `${daysRemaining} days remaining`;
 
         return `
-            <div class="p-6 hover:bg-gray-50 transition-colors border-b ${cropClass}">
+            <div class="p-6 hover:bg-gray-50 transition-colors border-b">
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <div class="flex items-center space-x-3 mb-2">
+                            <span class="text-2xl">${cropData[field.cropType].icon}</span>
                             <h3 class="text-lg font-semibold text-gray-900">${escapeHtml(field.fieldName)}</h3>
-                            <span class="px-3 py-1 rounded-full text-white text-sm ${statusColor} ${readyClass}">
+                            <span class="px-3 py-1 rounded-full text-white text-sm ${statusColor}">
                                 ${statusText}
                             </span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                             <div>
                                 <strong>Crop:</strong> ${escapeHtml(field.cropType)}
-                                <span class="ml-2 text-xs bg-gray-200 px-2 py-1 rounded">
-                                    ${cropData[field.cropType]?.growthTime}mo
-                                </span>
+                                ${field.fieldSize ? `<span class="ml-2 text-xs bg-gray-200 px-2 py-1 rounded">${field.fieldSize} ha</span>` : ''}
                             </div>
-                            <div><strong>Planted:</strong> ${formatDate(field.plantDate)}</div>
-                            <div><strong>Harvest:</strong> ${formatDate(field.harvestDate)}</div>
+                            <div><strong>Planted:</strong> Day ${field.plantDate.day}, ${monthNames[field.plantDate.month]}</div>
+                            <div><strong>Harvest:</strong> Day ${field.harvestDate.day}, ${monthNames[field.harvestDate.month]}</div>
                         </div>
                         ${field.notes ? `
                             <div class="mt-2 text-sm text-gray-600">
@@ -380,8 +364,7 @@ function updateFieldsList() {
                         ` : ''}
                     </div>
                     <button onclick="removeField(${field.id})" 
-                            class="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Remove field">
+                            class="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                         <i data-lucide="trash-2" class="h-5 w-5"></i>
                     </button>
                 </div>
@@ -391,21 +374,172 @@ function updateFieldsList() {
 
     container.innerHTML = fieldsHTML;
     
-    // Re-initialize Lucide icons for new content
+    // Re-initialize icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
 }
 
+/**
+ * Create crop calendar visual
+ */
+function createCropCalendar() {
+    const container = document.getElementById('crop-calendar');
+    const months = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2]; // Mar-Feb
+    
+    let calendarHTML = `
+        <div class="crop-calendar-grid">
+            <div class="calendar-header">
+                <div class="crop-name-header">Crop</div>
+                ${months.map(month => `<div class="month-header">${monthNames[month].substring(0, 3)}</div>`).join('')}
+            </div>
+    `;
+    
+    Object.keys(cropData).sort().forEach(crop => {
+        const data = cropData[crop];
+        calendarHTML += `
+            <div class="crop-row">
+                <div class="crop-name">
+                    <span class="crop-icon">${data.icon}</span>
+                    <span>${crop}</span>
+                </div>
+                ${months.map(month => {
+                    let cellClass = 'calendar-cell';
+                    if (data.plantingSeason.includes(month)) cellClass += ' planting-season';
+                    if (data.harvestSeason.includes(month)) cellClass += ' harvest-season';
+                    if (month === currentGameDate.month) cellClass += ' current-month';
+                    return `<div class="${cellClass}"></div>`;
+                }).join('')}
+            </div>
+        `;
+    });
+    
+    calendarHTML += '</div>';
+    container.innerHTML = calendarHTML;
+}
+
 // ========================================
-// UTILITY UI FUNCTIONS
+// MODAL FUNCTIONS
 // ========================================
 
-/**
- * Escape HTML to prevent XSS
- * @param {string} unsafe - Unsafe string
- * @returns {string} Escaped string
- */
+function showAddForm() {
+    document.getElementById('add-field-modal').classList.remove('hidden');
+    document.getElementById('add-field-modal').classList.add('flex');
+    
+    // Set current month as default
+    document.getElementById('plant-month').value = currentGameDate.month;
+    document.getElementById('plant-day').value = currentGameDate.day;
+    
+    document.getElementById('field-name').focus();
+}
+
+function hideAddForm() {
+    document.getElementById('add-field-modal').classList.add('hidden');
+    document.getElementById('add-field-form').reset();
+}
+
+function showDatePicker() {
+    document.getElementById('date-picker-modal').classList.remove('hidden');
+    document.getElementById('date-picker-modal').classList.add('flex');
+    
+    document.getElementById('game-day').value = currentGameDate.day;
+    document.getElementById('game-month').value = currentGameDate.month;
+    document.getElementById('game-year').value = currentGameDate.year;
+}
+
+function hideDatePicker() {
+    document.getElementById('date-picker-modal').classList.add('hidden');
+}
+
+function updateGameDate() {
+    currentGameDate.day = parseInt(document.getElementById('game-day').value);
+    currentGameDate.month = parseInt(document.getElementById('game-month').value);
+    currentGameDate.year = parseInt(document.getElementById('game-year').value);
+    
+    saveData();
+    updateDisplay();
+    hideDatePicker();
+    
+    showNotification('Game date updated successfully!', 'success');
+}
+
+// ========================================
+// FIELD MANAGEMENT
+// ========================================
+
+function addField() {
+    const fieldName = document.getElementById('field-name').value.trim();
+    const cropType = document.getElementById('crop-type').value;
+    const plantMonth = parseInt(document.getElementById('plant-month').value);
+    const plantDay = parseInt(document.getElementById('plant-day').value);
+    const fieldSize = parseFloat(document.getElementById('field-size').value) || null;
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!fieldName || !cropType || !plantMonth || !plantDay) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+
+    if (fields.some(field => field.fieldName.toLowerCase() === fieldName.toLowerCase())) {
+        alert('A field with this name already exists.');
+        return;
+    }
+
+    const harvestDate = calculateHarvestDate(plantDay, plantMonth, cropType);
+    
+    const field = {
+        id: Date.now(),
+        fieldName,
+        cropType,
+        plantDate: { day: plantDay, month: plantMonth },
+        harvestDate,
+        fieldSize,
+        notes
+    };
+
+    fields.push(field);
+    saveData();
+    updateDisplay();
+    hideAddForm();
+    
+    showNotification(`Field "${fieldName}" added successfully!`, 'success');
+}
+
+function removeField(id) {
+    const field = fields.find(f => f.id === id);
+    if (field && confirm(`Remove "${field.fieldName}"?`)) {
+        fields = fields.filter(field => field.id !== id);
+        saveData();
+        updateDisplay();
+        showNotification(`Field removed.`, 'info');
+    }
+}
+
+// ========================================
+// DATA PERSISTENCE & UTILITIES
+// ========================================
+
+function saveData() {
+    const data = {
+        currentGameDate,
+        fields
+    };
+    localStorage.setItem('fs25Calculator', JSON.stringify(data));
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem('fs25Calculator');
+        if (saved) {
+            const data = JSON.parse(saved);
+            currentGameDate = data.currentGameDate || currentGameDate;
+            fields = data.fields || [];
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+    }
+}
+
 function escapeHtml(unsafe) {
     return unsafe
         .replace(/&/g, "&amp;")
@@ -415,15 +549,9 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
-/**
- * Show notification message
- * @param {string} message - Message to show
- * @param {string} type - Notification type (success, error, info)
- */
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+    notification.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
         type === 'success' ? 'bg-green-500 text-white' :
         type === 'error' ? 'bg-red-500 text-white' :
         'bg-blue-500 text-white'
@@ -432,10 +560,8 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Remove notification after 3 seconds
     setTimeout(() => {
         notification.style.opacity = '0';
-        notification.style.transform = 'translateY(-20px)';
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
@@ -444,86 +570,44 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// ========================================
-// EVENT HANDLERS
-// ========================================
-
-/**
- * Handle keyboard shortcuts
- */
-function handleKeyboardShortcuts(event) {
-    // ESC to close modal
-    if (event.key === 'Escape') {
-        const modal = document.getElementById('add-field-modal');
-        if (!modal.classList.contains('hidden')) {
-            hideAddForm();
-        }
-    }
+function populateCropSelect() {
+    const select = document.getElementById('crop-type');
+    select.innerHTML = '<option value="">Select a crop</option>';
     
-    // Ctrl/Cmd + N to add new field
-    if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
-        event.preventDefault();
-        showAddForm();
-    }
+    Object.keys(cropData).sort().forEach(crop => {
+        const option = document.createElement('option');
+        option.value = crop;
+        option.textContent = `${cropData[crop].icon} ${crop} (${cropData[crop].growthTime} months)`;
+        select.appendChild(option);
+    });
 }
 
-/**
- * Handle form submission
- */
-function handleFormSubmit(event) {
-    event.preventDefault();
-    addField();
-}
-
-/**
- * Handle modal click outside to close
- */
-function handleModalClick(event) {
-    const modal = document.getElementById('add-field-modal');
-    if (event.target === modal) {
-        hideAddForm();
-    }
+function updateDisplay() {
+    updateGameDateDisplay();
+    updatePlantingRecommendations();
+    updateHarvestRecommendations();
+    updateSummaryCards();
+    updateFieldsList();
+    createCropCalendar();
 }
 
 // ========================================
 // INITIALIZATION
 // ========================================
 
-/**
- * Initialize the application
- */
 function init() {
-    try {
-        // Load data
-        loadFields();
-        
-        // Setup UI
-        populateCropSelect();
-        populateCropReference();
-        updateDisplay();
-        
-        // Setup event listeners
-        document.addEventListener('keydown', handleKeyboardShortcuts);
-        document.getElementById('add-field-form').addEventListener('submit', handleFormSubmit);
-        document.getElementById('add-field-modal').addEventListener('click', handleModalClick);
-        
-        // Initialize Lucide icons
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-        
-        // Auto-refresh every minute to update time remaining
-        setInterval(updateDisplay, 60000);
-        
-        console.log('Farming Simulator 25 Calculator initialized successfully!');
-        
-    } catch (error) {
-        console.error('Error initializing application:', error);
-        showNotification('Error initializing application. Please refresh the page.', 'error');
+    loadData();
+    populateCropSelect();
+    updateDisplay();
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
+    
+    console.log('FS25 Crop Calculator initialized!');
 }
 
-// Start the application when DOM is loaded
+// Start the application
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {

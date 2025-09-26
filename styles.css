@@ -1,11 +1,16 @@
-/* Custom styles for Farming Simulator 25 Calculator */
+/* FS25 Crop Calculator Enhanced Styles */
 
-/* Modal overlay blur effect */
+/* Base transitions */
+* {
+    transition: all 0.2s ease;
+}
+
+/* Modal overlay */
 .modal-overlay {
     backdrop-filter: blur(4px);
 }
 
-/* Custom scrollbar for webkit browsers */
+/* Enhanced scrollbars */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -17,32 +22,18 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: linear-gradient(135deg, #10b981, #059669);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: linear-gradient(135deg, #059669, #047857);
 }
 
-/* Smooth transitions for all elements */
-* {
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, 
-                transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Focus states for better accessibility */
-input:focus,
-select:focus,
-button:focus {
-    outline: 2px solid #10b981;
-    outline-offset: 2px;
-}
-
-/* Custom button hover effects */
+/* Button enhancements */
 button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 button:active {
@@ -51,67 +42,367 @@ button:active {
 
 /* Card hover effects */
 .bg-white:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
-/* Loading animation for future use */
-@keyframes pulse {
-    0%, 100% {
+/* ========================================
+   CROP CALENDAR STYLES
+   ======================================== */
+
+.crop-calendar-grid {
+    display: grid;
+    grid-template-columns: 200px repeat(12, 1fr);
+    gap: 1px;
+    background-color: #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.calendar-header {
+    display: contents;
+}
+
+.crop-name-header,
+.month-header {
+    background: linear-gradient(135deg, #374151, #1f2937);
+    color: white;
+    padding: 12px 8px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 13px;
+}
+
+.crop-name-header {
+    text-align: left;
+    padding-left: 16px;
+}
+
+.crop-row {
+    display: contents;
+}
+
+.crop-name {
+    background: #f9fafb;
+    padding: 12px 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-right: 2px solid #e5e7eb;
+}
+
+.crop-icon {
+    font-size: 16px;
+}
+
+.calendar-cell {
+    background: #ffffff;
+    min-height: 40px;
+    position: relative;
+    border-right: 1px solid #f3f4f6;
+}
+
+.calendar-cell.planting-season {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.calendar-cell.harvest-season {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.calendar-cell.planting-season.harvest-season {
+    background: linear-gradient(45deg, #10b981 0%, #10b981 50%, #f97316 50%, #f97316 100%);
+}
+
+.calendar-cell.current-month::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 3px solid #3b82f6;
+    border-radius: 4px;
+    pointer-events: none;
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% { 
+        border-color: #3b82f6;
         opacity: 1;
     }
-    50% {
-        opacity: 0.5;
+    50% { 
+        border-color: #60a5fa;
+        opacity: 0.7;
     }
 }
 
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* ========================================
+   ENHANCED STATS CARDS
+   ======================================== */
+
+.stats-card {
+    background: linear-gradient(135deg, var(--from-color), var(--to-color));
+    color: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Status badge animations */
-@keyframes bounce {
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.stats-card:hover::before {
+    transform: translateX(100%);
+}
+
+.stats-icon {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    backdrop-filter: blur(10px);
+}
+
+/* ========================================
+   SEASONAL INDICATORS
+   ======================================== */
+
+.season-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.season-spring { 
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.season-summer { 
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.season-fall { 
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.season-winter { 
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+}
+
+/* ========================================
+   FIELD STATUS INDICATORS
+   ======================================== */
+
+.status-ready {
+    background: linear-gradient(135deg, #10b981, #059669);
+    animation: bounce-gentle 2s infinite;
+}
+
+.status-soon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    animation: pulse-warning 2s infinite;
+}
+
+.status-growing {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+@keyframes bounce-gentle {
     0%, 20%, 53%, 80%, 100% {
         transform: translate3d(0, 0, 0);
     }
     40%, 43% {
-        transform: translate3d(0, -6px, 0);
+        transform: translate3d(0, -4px, 0);
     }
     70% {
-        transform: translate3d(0, -3px, 0);
+        transform: translate3d(0, -2px, 0);
     }
     90% {
         transform: translate3d(0, -1px, 0);
     }
 }
 
-.ready-harvest {
-    animation: bounce 2s infinite;
+@keyframes pulse-warning {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
 }
 
-/* Mobile responsiveness improvements */
+/* ========================================
+   ENHANCED FORM ELEMENTS
+   ======================================== */
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #10b981;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Enhanced buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: white;
+    font-weight: 500;
+}
+
+/* ========================================
+   WEATHER/SEASON DISPLAY
+   ======================================== */
+
+.weather-widget {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.weather-widget::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate-slow 20s linear infinite;
+}
+
+@keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.weather-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   NOTIFICATION SYSTEM
+   ======================================== */
+
+.notification {
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.notification-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9));
+}
+
+.notification-error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+}
+
+.notification-info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.9));
+}
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
 @media (max-width: 768px) {
-    .max-w-7xl {
-        padding-left: 1rem;
-        padding-right: 1rem;
+    .crop-calendar-grid {
+        font-size: 10px;
+        grid-template-columns: 120px repeat(12, 1fr);
     }
     
-    h1 {
-        font-size: 1.875rem;
+    .crop-name {
+        padding: 8px 12px;
+        font-size: 11px;
     }
     
-    .grid-cols-4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 480px) {
-    .grid-cols-4,
-    .grid-cols-2 {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
+    .crop-icon {
+        font-size: 14px;
     }
     
-    .flex-col-mobile {
-        flex-direction: column;
+    .calendar-cell {
+        min-height: 30px;
+    }
+    
+    .stats-card {
+        padding: 16px;
     }
     
     h1 {
@@ -119,51 +410,133 @@ button:active {
     }
 }
 
-/* Print styles */
-@media print {
-    .bg-gradient-to-br {
-        background: white;
+@media (max-width: 480px) {
+    .crop-calendar-grid {
+        grid-template-columns: 100px repeat(12, 1fr);
+        font-size: 8px;
     }
     
-    button {
-        display: none;
+    .crop-name {
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 8px;
+        text-align: center;
     }
     
-    .shadow-lg,
-    .shadow-md {
-        box-shadow: none;
-        border: 1px solid #e5e7eb;
+    .calendar-cell {
+        min-height: 24px;
     }
 }
 
-/* Dark mode support (for future implementation) */
+/* ========================================
+   DARK MODE SUPPORT
+   ======================================== */
+
 @media (prefers-color-scheme: dark) {
-    /* We can add dark mode styles here later if needed */
+    body {
+        background: linear-gradient(135deg, #1f2937, #111827);
+        color: #f9fafb;
+    }
+    
+    .bg-white {
+        background: linear-gradient(135deg, #374151, #1f2937) !important;
+        color: #f9fafb;
+    }
+    
+    .crop-name {
+        background: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .calendar-cell {
+        background: #6b7280;
+    }
+    
+    input, select {
+        background: #374151;
+        color: #f9fafb;
+        border-color: #4b5563;
+    }
 }
 
-/* Custom crop type colors for visual distinction */
-.crop-wheat { border-left: 4px solid #F59E0B; }
-.crop-barley { border-left: 4px solid #F59E0B; }
-.crop-canola { border-left: 4px solid #EAB308; }
-.crop-oats { border-left: 4px solid #84CC16; }
-.crop-corn { border-left: 4px solid #22D3EE; }
-.crop-sunflowers { border-left: 4px solid #F59E0B; }
-.crop-soybeans { border-left: 4px solid #22D3EE; }
-.crop-potatoes { border-left: 4px solid #10B981; }
-.crop-rice { border-left: 4px solid #06B6D4; }
-.crop-longgrainrice { border-left: 4px solid #10B981; }
-.crop-sugarbeet { border-left: 4px solid #F59E0B; }
-.crop-sugarcane { border-left: 4px solid #F59E0B; }
-.crop-cotton { border-left: 4px solid #EAB308; }
-.crop-sorghum { border-left: 4px solid #06B6D4; }
-.crop-grapes { border-left: 4px solid #10B981; }
-.crop-olives { border-left: 4px solid #06B6D4; }
-.crop-poplar { border-left: 4px solid #DC2626; }
-.crop-redbeet { border-left: 4px solid #06B6D4; }
-.crop-carrots { border-left: 4px solid #06B6D4; }
-.crop-parsnips { border-left: 4px solid #06B6D4; }
-.crop-greenbeans { border-left: 4px solid #06B6D4; }
-.crop-peas { border-left: 4px solid #06B6D4; }
-.crop-spinach { border-left: 4px solid #10B981; }
-.crop-grass { border-left: 4px solid #22C55E; }
-.crop-oilseedradish { border-left: 4px solid #22C55E; }
+/* ========================================
+   ANIMATIONS & EFFECTS
+   ======================================== */
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.grow {
+    animation: grow 0.3s ease-out;
+}
+
+@keyframes grow {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Field rows with crop colors */
+.field-row {
+    border-left: 5px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.field-row:hover {
+    border-left-color: #10b981;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.05), transparent);
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}

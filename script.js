@@ -388,17 +388,14 @@ function updateHarvestRecommendations() {
 function updateFieldsList() {
     const container = document.getElementById('fields-container');
     const emptyState = document.getElementById('empty-state');
-    
     if (!container) return;
 
     if (fields.length === 0) {
         if (emptyState) emptyState.style.display = 'block';
         return;
     }
-
     if (emptyState) emptyState.style.display = 'none';
 
-    // Sort by harvest date
     const sortedFields = [...fields].sort((a, b) => {
         return getGameDaysRemaining(a.harvestDate) - getGameDaysRemaining(b.harvestDate);
     });
@@ -406,7 +403,6 @@ function updateFieldsList() {
     const fieldsHTML = sortedFields.map(field => {
         const daysRemaining = getGameDaysRemaining(field.harvestDate);
         let statusClass, statusText;
-
         if (daysRemaining <= 0) {
             statusClass = 'status-ready';
             statusText = 'Ready to Harvest!';
@@ -420,6 +416,30 @@ function updateFieldsList() {
             const unit = gameSettings.daysPerMonth === 1 ? 'days' : 'days';
             statusText = `${daysRemaining} ${unit} remaining`;
         }
+
+        // Checklist rendering
+        const checklist = getChecklistForField(field);
+        const checklistHTML = `
+            <div class="mt-4 checklist">
+                <div class="font-semibold mb-1 text-xs text-gray-400">Field Checklist</div>
+                <ul class="space-y-1">
+                    ${checklist.map(item => `
+                        <li>
+                            <label style="opacity:${item.disabled ? 0.5 : 1};cursor:${item.disabled ? 'not-allowed' : 'pointer'};">
+                                <input type="checkbox"
+                                    ${item.checked ? 'checked' : ''}
+                                    ${item.disabled ? 'disabled' : ''}
+                                    onchange="toggleChecklist(${field.id}, '${item.key}')"
+                                    style="accent-color:#22d3ee;margin-right:0.5em;"
+                                >
+                                ${item.label}
+                                ${item.info ? `<span class="text-xs text-gray-500 ml-1">(${item.info})</span>` : ''}
+                            </label>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
 
         return `
             <div class="p-6 border-b border-gray-200 hover:bg-gray-50 transition-colors">
@@ -448,12 +468,13 @@ function updateFieldsList() {
                     </div>
                     ${field.notes ? `<div class="col-span-full"><strong class="text-gray-900">Notes:</strong> ${field.notes}</div>` : ''}
                 </div>
+                ${checklistHTML}
             </div>
         `;
     }).join('');
 
     container.innerHTML = fieldsHTML;
-    
+
     // Re-initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -695,7 +716,8 @@ function addField() {
         plantDate: { day: plantDay, month: plantMonth, year: currentGameDate.year },
         harvestDate,
         fieldSize,
-        notes
+        notes,
+        checklist: getChecklistForField({ cropType })
     };
 
     fields.push(field);
@@ -743,8 +765,15 @@ function loadData() {
                 gameSettings = { ...gameSettings, ...data.gameSettings };
             }
             if (data.fields && Array.isArray(data.fields)) {
-                fields = data.fields;
-                // Recalculate harvest dates to ensure they match current settings
+                fields = data.fields.map(f => ({
+                    ...f,
+                    checklist: getChecklistForField(f)
+                        .map(item => {
+                            // preserve checked state if present
+                            const prev = f.checklist?.find(c => c.key === item.key);
+                            return { ...item, checked: prev ? !!prev.checked : false };
+                        })
+                }));
                 recalculateAllHarvestDates();
             }
         }
@@ -843,6 +872,9 @@ function incrementGameDay(amount) {
 
     saveData();
     updateAllDisplays();
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 // Event Listeners

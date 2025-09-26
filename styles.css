@@ -381,19 +381,37 @@ select {
     transition: all 0.2s ease;
 }
 
-/* Fix field hover: prevent bright hover on field rows */
+/* Fix field hover: prevent bright hover on field rows and all children */
 #fields-container > .p-6,
-#fields-container > .p-6:hover {
+#fields-container > .p-6:hover,
+#fields-container > .p-6:focus,
+#fields-container > .p-6:active {
     background: #23232b !important;
     color: #f3f4f6 !important;
     border-color: #3f3f46 !important;
-    transition: background 0.2s;
+    box-shadow: none !important;
+    transition: none !important;
 }
 
-/* Remove Tailwind's light hover from field rows */
-#fields-container > .p-6:hover .text-gray-900,
-#fields-container > .p-6:hover .text-gray-600 {
+/* Force all text inside field rows to stay light on hover */
+#fields-container > .p-6 *,
+#fields-container > .p-6:hover *,
+#fields-container > .p-6:focus *,
+#fields-container > .p-6:active * {
     color: #f3f4f6 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Remove Tailwind's light hover and shadow from field rows */
+#fields-container > .p-6:hover,
+#fields-container > .p-6:focus,
+#fields-container > .p-6:active {
+    filter: none !important;
+    background: #23232b !important;
+    color: #f3f4f6 !important;
+    border-color: #3f3f46 !important;
+    box-shadow: none !important;
 }
 
 /* Action Buttons */

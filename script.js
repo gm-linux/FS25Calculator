@@ -238,7 +238,7 @@ const checklistTemplate = [
 ];
 
 // Helper to get checklist for a field
-function getChecklistForField(field) {
+window.getChecklistForField = function(field) {
     const isStubble = stubbleCrops.includes(field.cropType);
     return checklistTemplate.map(item => ({
         key: item.key,
@@ -249,10 +249,10 @@ function getChecklistForField(field) {
         checked: field.checklist?.find(c => c.key === item.key)?.checked || false,
         disabled: (item.stubbleOnly && !isStubble)
     }));
-}
+};
 
 // Checklist toggle handler
-function toggleChecklist(fieldId, key) {
+window.toggleChecklist = function(fieldId, key) {
     const field = fields.find(f => f.id === fieldId);
     if (!field) return;
     if (!field.checklist) field.checklist = getChecklistForField(field);

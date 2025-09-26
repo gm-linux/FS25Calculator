@@ -24,7 +24,7 @@
                     </div>
                 </div>
 
-                <!-- Current Date & Add Button -->
+                <!-- Current Date & Game Settings -->
                 <div class="flex items-center space-x-4">
                     <div class="text-right">
                         <p class="text-sm text-gray-500">Current Game Date</p>
@@ -32,6 +32,9 @@
                             <span id="current-game-date">Day 3, October, Year 1</span>
                             <i data-lucide="edit-2" class="w-4 h-4"></i>
                         </button>
+                        <p class="text-xs text-gray-400 mt-1">
+                            <span id="days-per-month-display">28</span> days/month
+                        </p>
                     </div>
                     <button onclick="showAddForm()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
                         <i data-lucide="plus" class="w-4 h-4"></i>
@@ -226,7 +229,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Plant Day</label>
-                        <input type="number" id="plant-day" min="1" max="28" placeholder="1-28" 
+                        <input type="number" id="plant-day" min="1" placeholder="Day" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
                 </div>
@@ -255,46 +258,72 @@
         </div>
     </div>
 
-    <!-- Date Picker Modal -->
+    <!-- Date & Settings Picker Modal -->
     <div id="date-picker-modal" class="modal">
         <div class="modal-backdrop" onclick="hideDatePicker()"></div>
         <div class="modal-content">
             <div class="p-6 border-b flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-900">Set Game Date</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Game Date & Settings</h3>
                 <button onclick="hideDatePicker()" class="text-gray-400 hover:text-gray-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Day</label>
-                    <input type="number" id="game-day" min="1" max="28" value="3" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            <div class="p-6 space-y-6">
+                <!-- Game Settings Section -->
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        Game Settings
+                    </h4>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Days Per Month</label>
+                        <select id="days-per-month" onchange="onDaysPerMonthChange()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="1">1 day (Fastest)</option>
+                            <option value="3">3 days (Fast)</option>
+                            <option value="7">7 days (Normal)</option>
+                            <option value="14">14 days (Slow)</option>
+                            <option value="28" selected>28 days (Realistic)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Match your in-game time settings</p>
+                    </div>
                 </div>
 
+                <!-- Current Date Section -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
-                    <select id="game-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10" selected>October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
-                    <input type="number" id="game-year" min="1" value="1" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        Current Date
+                    </h4>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Day</label>
+                            <input type="number" id="game-day" min="1" value="3" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                            <select id="game-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10" selected>October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                            <input type="number" id="game-year" min="1" value="1" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                    </div>
                 </div>
             </div>
 

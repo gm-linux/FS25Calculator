@@ -1,5 +1,5 @@
 /**
- * FS25 Crop Calculator - Fixed JavaScript
+ * FS25 Crop Calculator - With Days Per Month Configuration
  */
 
 // Game state
@@ -7,6 +7,10 @@ let currentGameDate = {
     day: 3,
     month: 10, // October
     year: 1
+};
+
+let gameSettings = {
+    daysPerMonth: 28 // Default to realistic setting
 };
 
 let fields = [];
@@ -173,22 +177,28 @@ const cropData = {
     }
 };
 
-// Date utility functions
+// Date utility functions - Updated to use configurable days per month
 function gameDataToDays(day, month, year) {
-    return (year - 1) * 336 + ((month - 1) * 28) + (day - 1);
+    const daysPerMonth = gameSettings.daysPerMonth;
+    const daysPerYear = daysPerMonth * 12;
+    return (year - 1) * daysPerYear + ((month - 1) * daysPerMonth) + (day - 1);
 }
 
 function daysToGameDate(totalDays) {
-    const year = Math.floor(totalDays / 336) + 1;
-    const remainingDays = totalDays % 336;
-    const month = Math.floor(remainingDays / 28) + 1;
-    const day = (remainingDays % 28) + 1;
+    const daysPerMonth = gameSettings.daysPerMonth;
+    const daysPerYear = daysPerMonth * 12;
+    
+    const year = Math.floor(totalDays / daysPerYear) + 1;
+    const remainingDays = totalDays % daysPerYear;
+    const month = Math.floor(remainingDays / daysPerMonth) + 1;
+    const day = (remainingDays % daysPerMonth) + 1;
+    
     return { day, month, year };
 }
 
 function calculateHarvestDate(plantDay, plantMonth, plantYear, cropType) {
     const plantTotalDays = gameDataToDays(plantDay, plantMonth, plantYear);
-    const growthTimeInDays = cropData[cropType].growthTime * 28;
+    const growthTimeInDays = cropData[cropType].growthTime * gameSettings.daysPerMonth;
     const harvestTotalDays = plantTotalDays + growthTimeInDays;
     return daysToGameDate(harvestTotalDays);
 }
@@ -207,6 +217,70 @@ function isHarvestSeason(cropType) {
     return cropData[cropType].harvestSeason.includes(currentGameDate.month);
 }
 
+// Game Settings Functions
+function onDaysPerMonthChange() {
+    const select = document.getElementById('days-per-month');
+    if (!select) return;
+    
+    const oldDaysPerMonth = gameSettings.daysPerMonth;
+    const newDaysPerMonth = parseInt(select.value);
+    
+    if (newDaysPerMonth !== oldDaysPerMonth) {
+        gameSettings.daysPerMonth = newDaysPerMonth;
+        
+        // Update max day validation for current day input
+        updateDayInputValidation();
+        
+        // Recalculate all harvest dates
+        recalculateAllHarvestDates();
+        
+        // Update display
+        updateDaysPerMonthDisplay();
+        
+        // Save settings
+        saveData();
+        
+        showNotification(`Days per month updated to ${newDaysPerMonth}. All harvest dates recalculated.`, 'info');
+    }
+}
+
+function updateDayInputValidation() {
+    const dayInput = document.getElementById('game-day');
+    const plantDayInput = document.getElementById('plant-day');
+    
+    if (dayInput) {
+        dayInput.max = gameSettings.daysPerMonth.toString();
+        if (parseInt(dayInput.value) > gameSettings.daysPerMonth) {
+            dayInput.value = gameSettings.daysPerMonth.toString();
+        }
+    }
+    
+    if (plantDayInput) {
+        plantDayInput.max = gameSettings.daysPerMonth.toString();
+        plantDayInput.placeholder = `1-${gameSettings.daysPerMonth}`;
+    }
+}
+
+function recalculateAllHarvestDates() {
+    fields.forEach(field => {
+        field.harvestDate = calculateHarvestDate(
+            field.plantDate.day,
+            field.plantDate.month,
+            field.plantDate.year || currentGameDate.year,
+            field.cropType
+        );
+    });
+    
+    updateAllDisplays();
+}
+
+function updateDaysPerMonthDisplay() {
+    const display = document.getElementById('days-per-month-display');
+    if (display) {
+        display.textContent = gameSettings.daysPerMonth.toString();
+    }
+}
+
 // UI Update Functions
 function updateGameDateDisplay() {
     const dateElement = document.getElementById('current-game-date');
@@ -220,6 +294,8 @@ function updateGameDateDisplay() {
     if (seasonElement) {
         seasonElement.textContent = seasons[currentGameDate.month] || 'Unknown';
     }
+    
+    updateDaysPerMonthDisplay();
 }
 
 function updateStatsCards() {
@@ -257,15 +333,21 @@ function updatePlantingRecommendations() {
         return;
     }
     
-    container.innerHTML = canPlant.map(crop => `
-        <div class="recommendation-item">
-            <div class="crop-emoji">${cropData[crop].icon}</div>
-            <div class="crop-info">
-                <div class="crop-name">${crop}</div>
-                <div class="crop-details">${cropData[crop].growthTime} months to harvest</div>
+    container.innerHTML = canPlant.map(crop => {
+        const realDays = Math.round(cropData[crop].growthTime * gameSettings.daysPerMonth);
+        const timeUnit = gameSettings.daysPerMonth === 1 ? 'days' : 'months';
+        const timeValue = gameSettings.daysPerMonth === 1 ? realDays : cropData[crop].growthTime;
+        
+        return `
+            <div class="recommendation-item">
+                <div class="crop-emoji">${cropData[crop].icon}</div>
+                <div class="crop-info">
+                    <div class="crop-name">${crop}</div>
+                    <div class="crop-details">${timeValue} ${timeUnit} to harvest</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function updateHarvestRecommendations() {
@@ -322,12 +404,15 @@ function updateFieldsList() {
         if (daysRemaining <= 0) {
             statusClass = 'status-ready';
             statusText = 'Ready to Harvest!';
-        } else if (daysRemaining <= 28) {
+        } else if (daysRemaining <= gameSettings.daysPerMonth) {
             statusClass = 'status-warning';
-            statusText = `${daysRemaining} days remaining`;
+            const unit = gameSettings.daysPerMonth === 1 ? 'days' : 
+                         daysRemaining === 1 ? 'day' : 'days';
+            statusText = `${daysRemaining} ${unit} remaining`;
         } else {
             statusClass = 'status-growing';
-            statusText = `${daysRemaining} days remaining`;
+            const unit = gameSettings.daysPerMonth === 1 ? 'days' : 'days';
+            statusText = `${daysRemaining} ${unit} remaining`;
         }
 
         return `
@@ -430,7 +515,11 @@ function showAddForm() {
         const fieldName = document.getElementById('field-name');
         
         if (plantMonth) plantMonth.value = currentGameDate.month.toString();
-        if (plantDay) plantDay.value = currentGameDate.day.toString();
+        if (plantDay) {
+            plantDay.value = currentGameDate.day.toString();
+            plantDay.max = gameSettings.daysPerMonth.toString();
+            plantDay.placeholder = `1-${gameSettings.daysPerMonth}`;
+        }
         if (fieldName) {
             fieldName.value = '';
             setTimeout(() => fieldName.focus(), 100);
@@ -463,10 +552,15 @@ function showDatePicker() {
         const dayInput = document.getElementById('game-day');
         const monthInput = document.getElementById('game-month');
         const yearInput = document.getElementById('game-year');
+        const daysPerMonthInput = document.getElementById('days-per-month');
         
-        if (dayInput) dayInput.value = currentGameDate.day.toString();
+        if (dayInput) {
+            dayInput.value = currentGameDate.day.toString();
+            dayInput.max = gameSettings.daysPerMonth.toString();
+        }
         if (monthInput) monthInput.value = currentGameDate.month.toString();
         if (yearInput) yearInput.value = currentGameDate.year.toString();
+        if (daysPerMonthInput) daysPerMonthInput.value = gameSettings.daysPerMonth.toString();
     }
 }
 
@@ -481,15 +575,17 @@ function updateGameDate() {
     const dayInput = document.getElementById('game-day');
     const monthInput = document.getElementById('game-month');
     const yearInput = document.getElementById('game-year');
+    const daysPerMonthInput = document.getElementById('days-per-month');
     
-    if (dayInput && monthInput && yearInput) {
+    if (dayInput && monthInput && yearInput && daysPerMonthInput) {
         const newDay = parseInt(dayInput.value) || 1;
         const newMonth = parseInt(monthInput.value) || 1;
         const newYear = parseInt(yearInput.value) || 1;
+        const newDaysPerMonth = parseInt(daysPerMonthInput.value) || 28;
         
         // Validation
-        if (newDay < 1 || newDay > 28) {
-            showNotification('Day must be between 1 and 28', 'error');
+        if (newDay < 1 || newDay > newDaysPerMonth) {
+            showNotification(`Day must be between 1 and ${newDaysPerMonth}`, 'error');
             return;
         }
         
@@ -503,6 +599,13 @@ function updateGameDate() {
             return;
         }
         
+        // Update days per month if changed
+        const daysPerMonthChanged = newDaysPerMonth !== gameSettings.daysPerMonth;
+        if (daysPerMonthChanged) {
+            gameSettings.daysPerMonth = newDaysPerMonth;
+            recalculateAllHarvestDates();
+        }
+        
         currentGameDate.day = newDay;
         currentGameDate.month = newMonth;
         currentGameDate.year = newYear;
@@ -511,7 +614,11 @@ function updateGameDate() {
         updateAllDisplays();
         hideDatePicker();
         
-        showNotification('Game date updated successfully!', 'success');
+        if (daysPerMonthChanged) {
+            showNotification('Game date and days per month updated! All harvest dates recalculated.', 'success');
+        } else {
+            showNotification('Game date updated successfully!', 'success');
+        }
     }
 }
 
@@ -555,8 +662,8 @@ function addField() {
         return;
     }
 
-    if (!plantDay || plantDay < 1 || plantDay > 28) {
-        showNotification('Please enter a valid plant day (1-28)', 'error');
+    if (!plantDay || plantDay < 1 || plantDay > gameSettings.daysPerMonth) {
+        showNotification(`Please enter a valid plant day (1-${gameSettings.daysPerMonth})`, 'error');
         plantDayEl.focus();
         return;
     }
@@ -573,7 +680,7 @@ function addField() {
         id: Date.now(),
         fieldName,
         cropType,
-        plantDate: { day: plantDay, month: plantMonth },
+        plantDate: { day: plantDay, month: plantMonth, year: currentGameDate.year },
         harvestDate,
         fieldSize,
         notes
@@ -602,6 +709,7 @@ function saveData() {
     try {
         const data = {
             currentGameDate,
+            gameSettings,
             fields
         };
         localStorage.setItem('fs25Calculator', JSON.stringify(data));
@@ -619,8 +727,13 @@ function loadData() {
             if (data.currentGameDate) {
                 currentGameDate = data.currentGameDate;
             }
+            if (data.gameSettings) {
+                gameSettings = { ...gameSettings, ...data.gameSettings };
+            }
             if (data.fields && Array.isArray(data.fields)) {
                 fields = data.fields;
+                // Recalculate harvest dates to ensure they match current settings
+                recalculateAllHarvestDates();
             }
         }
     } catch (error) {
@@ -638,7 +751,11 @@ function populateCropSelect() {
     Object.keys(cropData).sort().forEach(crop => {
         const option = document.createElement('option');
         option.value = crop;
-        option.textContent = `${cropData[crop].icon} ${crop} (${cropData[crop].growthTime} months)`;
+        const timeUnit = gameSettings.daysPerMonth === 1 ? 'days' : 'months';
+        const timeValue = gameSettings.daysPerMonth === 1 ? 
+                         cropData[crop].growthTime * gameSettings.daysPerMonth : 
+                         cropData[crop].growthTime;
+        option.textContent = `${cropData[crop].icon} ${crop} (${timeValue} ${timeUnit})`;
         select.appendChild(option);
     });
 }
@@ -658,7 +775,8 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Auto remove after 4 seconds
+    // Auto remove after 5 seconds for longer messages
+    const timeout = message.length > 50 ? 6000 : 4000;
     setTimeout(() => {
         if (notification.parentNode) {
             notification.style.opacity = '0';
@@ -669,7 +787,7 @@ function showNotification(message, type = 'info') {
                 }
             }, 300);
         }
-    }, 4000);
+    }, timeout);
 }
 
 function updateAllDisplays() {
@@ -679,6 +797,7 @@ function updateAllDisplays() {
     updateHarvestRecommendations();
     updateFieldsList();
     createCropCalendar();
+    populateCropSelect(); // Re-populate to show correct time units
 }
 
 // Event Listeners

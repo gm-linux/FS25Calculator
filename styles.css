@@ -1,4 +1,4 @@
-/* FS25 Crop Calculator - Fixed Professional Styling */
+/* FS25 Crop Calculator - Fixed Professional Styling with Settings */
 
 /* Reset and Base Styles */
 * {
@@ -60,6 +60,15 @@ body {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
+}
+
+/* Settings Section Styling */
+.bg-blue-50 {
+    background-color: #eff6ff;
+}
+
+.text-blue-900 {
+    color: #1e3a8a;
 }
 
 /* Button Styles */
@@ -307,6 +316,13 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
+/* Blue focus for settings */
+select:focus-within .bg-blue-50,
+input:focus-within .bg-blue-50 {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 input::placeholder {
     color: #9ca3af;
 }
@@ -411,6 +427,22 @@ select {
     margin-bottom: 1.5rem;
 }
 
+/* Settings Section Enhancements */
+.bg-blue-50 h4 {
+    color: #1e3a8a;
+}
+
+.bg-blue-50 select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Header Days Per Month Display */
+#days-per-month-display {
+    font-weight: 600;
+    color: #16a34a;
+}
+
 /* Improved Header Responsiveness */
 @media (max-width: 768px) {
     header .max-w-6xl {
@@ -457,6 +489,10 @@ select {
         grid-template-columns: 1fr;
     }
     
+    .grid.grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+    
     .recommendation-item {
         padding: 0.75rem;
     }
@@ -471,6 +507,11 @@ select {
     
     .crop-details {
         font-size: 0.7rem;
+    }
+    
+    /* Settings section mobile adjustments */
+    .bg-blue-50 {
+        padding: 1rem;
     }
 }
 
@@ -504,6 +545,7 @@ select {
         right: 0.5rem;
         left: 0.5rem;
         max-width: none;
+        font-size: 0.875rem;
     }
 }
 
@@ -528,6 +570,13 @@ input:focus,
 select:focus {
     outline: 2px solid #16a34a;
     outline-offset: 2px;
+}
+
+/* Blue focus for settings elements */
+.bg-blue-50 button:focus,
+.bg-blue-50 input:focus,
+.bg-blue-50 select:focus {
+    outline-color: #3b82f6;
 }
 
 /* Scrollbar Styling */
@@ -564,5 +613,9 @@ select:focus {
     .calendar-grid,
     .bg-white {
         border: 1px solid #000 !important;
+    }
+    
+    .bg-blue-50 {
+        background: #f8f9fa !important;
     }
 }

@@ -609,31 +609,29 @@ function showAddForm() {
     }
 }
 
+let editingFieldId = null;
+
+function editField(id) {
+    const field = fields.find(f => f.id === id);
+    if (!field) return;
+    editingFieldId = id;
+    showAddForm();
+
+    // Pre-fill modal fields
+    document.getElementById('field-name').value = field.fieldName;
+    document.getElementById('crop-type').value = field.cropType;
+    document.getElementById('plant-month').value = field.plantDate.month;
+    document.getElementById('plant-day').value = field.plantDate.day;
+    document.getElementById('field-size').value = field.fieldSize ?? '';
+    document.getElementById('notes').value = field.notes ?? '';
+}
+
+// Reset editing state when modal is closed
 function hideAddForm() {
+    editingFieldId = null;
     const modal = document.getElementById('add-field-modal');
     if (modal) {
         modal.classList.remove('show');
-    }
-}
-
-function showDatePicker() {
-    const modal = document.getElementById('date-picker-modal');
-    if (modal) {
-        modal.classList.add('show');
-
-        // Set current values
-        const dayInput = document.getElementById('game-day');
-        const monthInput = document.getElementById('game-month');
-        const yearInput = document.getElementById('game-year');
-        const daysPerMonthInput = document.getElementById('days-per-month');
-
-        if (dayInput) {
-            dayInput.value = currentGameDate.day.toString();
-            dayInput.max = gameSettings.daysPerMonth.toString();
-        }
-        if (monthInput) monthInput.value = currentGameDate.month.toString();
-        if (yearInput) yearInput.value = currentGameDate.year.toString();
-        if (daysPerMonthInput) daysPerMonthInput.value = gameSettings.daysPerMonth.toString();
     }
 }
 
@@ -747,6 +745,42 @@ function addField() {
         return;
     }
 
+    // If editing, update the field
+    if (editingFieldId !== null) {
+        const idx = fields.findIndex(f => f.id === editingFieldId);
+        if (idx !== -1) {
+            // Prevent duplicate name (except for self)
+            if (
+                fields.some(
+                    (f, i) =>
+                        i !== idx &&
+                        f.fieldName.toLowerCase() === fieldName.toLowerCase()
+                )
+            ) {
+                showNotification('A field with this name already exists', 'error');
+                fieldNameEl.focus();
+                return;
+            }
+            fields[idx] = {
+                ...fields[idx],
+                fieldName,
+                cropType,
+                plantDate: { day: plantDay, month: plantMonth, year: currentGameDate.year },
+                harvestDate: calculateHarvestDate(plantDay, plantMonth, currentGameDate.year, cropType),
+                fieldSize,
+                notes,
+                checklist: getChecklistForField(fields[idx]) // preserve checklist state
+            };
+            saveData();
+            updateAllDisplays();
+            hideAddForm();
+            editingFieldId = null;
+            showNotification(`Field "${fieldName}" updated!`, 'success');
+            return;
+        }
+    }
+
+    // Otherwise, add new field
     if (fields.some(field => field.fieldName.toLowerCase() === fieldName.toLowerCase())) {
         showNotification('A field with this name already exists', 'error');
         fieldNameEl.focus();
@@ -754,7 +788,7 @@ function addField() {
     }
 
     const harvestDate = calculateHarvestDate(plantDay, plantMonth, currentGameDate.year, cropType);
-    
+
     const field = {
         id: Date.now(),
         fieldName,
@@ -770,7 +804,7 @@ function addField() {
     saveData();
     updateAllDisplays();
     hideAddForm();
-    
+
     showNotification(`Field "${fieldName}" added successfully!`, 'success');
 }
 

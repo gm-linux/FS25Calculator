@@ -5,250 +5,284 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FS25 Crop Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo-icon">
-                        <i data-lucide="sprout"></i>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Top Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-green-500 p-2 rounded-lg">
+                        <i data-lucide="sprout" class="w-6 h-6 text-white"></i>
                     </div>
-                    <div class="logo-text">
-                        <h1>Farming Simulator 25</h1>
-                        <p>Crop Calculator</p>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">FS25 Crop Calculator</h1>
+                        <p class="text-sm text-gray-500">Track your farming progress</p>
                     </div>
                 </div>
-                
-                <div class="header-actions">
-                    <div class="current-date">
-                        <span class="date-label">Current Game Date</span>
-                        <div class="date-display">
+
+                <!-- Current Date & Add Button -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Current Game Date</p>
+                        <button onclick="showDatePicker()" class="font-semibold text-gray-900 hover:text-green-600 transition-colors">
                             <span id="current-game-date">Day 3, October, Year 1</span>
-                            <button onclick="showDatePicker()" class="date-edit-btn">
-                                <i data-lucide="edit-2"></i>
-                            </button>
-                        </div>
+                            <i data-lucide="edit-2" class="w-4 h-4 inline ml-1"></i>
+                        </button>
                     </div>
-                    
-                    <button onclick="showAddForm()" class="btn btn-primary">
-                        <i data-lucide="plus"></i>
-                        Add Field
+                    <button onclick="showAddForm()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Add Field</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="main">
-        <div class="container">
-            <!-- Stats Overview -->
-            <div class="stats-grid">
-                <div class="stat-card stat-total">
-                    <div class="stat-icon">
-                        <i data-lucide="map"></i>
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <i data-lucide="map-pin" class="w-6 h-6 text-blue-600"></i>
                     </div>
-                    <div class="stat-content">
-                        <span class="stat-label">Total Fields</span>
-                        <span id="total-fields" class="stat-number">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card stat-ready">
-                    <div class="stat-icon">
-                        <i data-lucide="check-circle"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">Ready to Harvest</span>
-                        <span id="ready-harvest" class="stat-number">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card stat-growing">
-                    <div class="stat-icon">
-                        <i data-lucide="seedling"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">Growing</span>
-                        <span id="growing" class="stat-number">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card stat-season">
-                    <div class="stat-icon">
-                        <i data-lucide="calendar"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">Current Season</span>
-                        <span id="current-season" class="stat-number">Fall</span>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total Fields</p>
+                        <p id="total-fields" class="text-2xl font-bold text-gray-900">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Recommendations -->
-            <div class="recommendations">
-                <div class="recommendation-card">
-                    <div class="card-header">
-                        <i data-lucide="sprout"></i>
-                        <h3>Plant This Month</h3>
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
                     </div>
-                    <div class="card-content">
-                        <div id="planting-recommendations" class="recommendation-list">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="recommendation-card">
-                    <div class="card-header">
-                        <i data-lucide="scissors"></i>
-                        <h3>Harvest Season</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="harvest-recommendations" class="recommendation-list">
-                            <!-- Populated by JavaScript -->
-                        </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Ready to Harvest</p>
+                        <p id="ready-harvest" class="text-2xl font-bold text-gray-900">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Fields List -->
-            <div class="fields-section">
-                <div class="section-header">
-                    <h2>Your Fields</h2>
-                </div>
-                
-                <div id="fields-container" class="fields-list">
-                    <div id="empty-state" class="empty-state">
-                        <i data-lucide="sprout"></i>
-                        <h3>No fields added yet</h3>
-                        <p>Start tracking your crops by adding your first field</p>
-                        <button onclick="showAddForm()" class="btn btn-primary">
-                            Add First Field
-                        </button>
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 p-3 rounded-lg">
+                        <i data-lucide="clock" class="w-6 h-6 text-yellow-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Growing</p>
+                        <p id="growing" class="text-2xl font-bold text-gray-900">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Crop Calendar -->
-            <div class="calendar-section">
-                <div class="section-header">
-                    <h2>
-                        <i data-lucide="calendar"></i>
-                        FS25 Crop Calendar
-                    </h2>
-                    <div class="calendar-legend">
-                        <div class="legend-item">
-                            <span class="legend-color planting"></span>
-                            <span>Planting Season</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color harvest"></span>
-                            <span>Harvest Season</span>
-                        </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <div class="flex items-center">
+                    <div class="bg-orange-100 p-3 rounded-lg">
+                        <i data-lucide="calendar" class="w-6 h-6 text-orange-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Season</p>
+                        <p id="current-season" class="text-2xl font-bold text-gray-900">Fall</p>
                     </div>
                 </div>
-                
-                <div class="calendar-wrapper">
-                    <div id="crop-calendar" class="crop-calendar">
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Plant This Month -->
+            <div class="bg-white rounded-xl shadow-sm border">
+                <div class="p-6 border-b">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-green-100 p-2 rounded-lg">
+                            <i data-lucide="seedling" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Plant This Month</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="planting-recommendations" class="space-y-3">
                         <!-- Populated by JavaScript -->
                     </div>
+                </div>
+            </div>
+
+            <!-- Harvest Season -->
+            <div class="bg-white rounded-xl shadow-sm border">
+                <div class="p-6 border-b">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-orange-100 p-2 rounded-lg">
+                            <i data-lucide="scissors" class="w-5 h-5 text-orange-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">Harvest Season</h3>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="harvest-recommendations" class="space-y-3">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Fields -->
+        <div class="bg-white rounded-xl shadow-sm border mb-8">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-semibold text-gray-900">Your Fields</h3>
+            </div>
+            <div id="fields-container">
+                <div id="empty-state" class="p-12 text-center">
+                    <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="sprout" class="w-8 h-8 text-gray-400"></i>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">No fields yet</h4>
+                    <p class="text-gray-500 mb-6">Start tracking your crops by adding your first field</p>
+                    <button onclick="showAddForm()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                        Add First Field
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crop Calendar -->
+        <div class="bg-white rounded-xl shadow-sm border">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-purple-100 p-2 rounded-lg">
+                            <i data-lucide="calendar" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900">FS25 Crop Calendar</h3>
+                    </div>
+                    <div class="flex items-center space-x-4 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-green-500 rounded"></div>
+                            <span class="text-gray-600">Plant</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 bg-orange-500 rounded"></div>
+                            <span class="text-gray-600">Harvest</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="crop-calendar" class="overflow-x-auto">
+                    <!-- Calendar will be generated here -->
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Add Field Modal -->
-    <div id="add-field-modal" class="modal">
-        <div class="modal-backdrop" onclick="hideAddForm()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Field</h2>
-                <button onclick="hideAddForm()" class="modal-close">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            
-            <form class="modal-body" onsubmit="event.preventDefault(); addField();">
-                <div class="form-group">
-                    <label>Field Name</label>
-                    <input type="text" id="field-name" placeholder="e.g., North Field, Field 12" required>
+    <div id="add-field-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="hideAddForm()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
+                <div class="p-6 border-b">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Add New Field</h3>
+                        <button onclick="hideAddForm()" class="text-gray-400 hover:text-gray-600">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label>Crop Type</label>
-                    <select id="crop-type" required>
-                        <option value="">Choose a crop...</option>
-                    </select>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Plant Month</label>
-                        <select id="plant-month" required>
-                            <option value="">Month</option>
-                            <option value="1">January</option>
-                            <option value="2">February</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Field Name</label>
+                        <input type="text" id="field-name" placeholder="e.g., North Field" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Crop Type</label>
+                        <select id="crop-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="">Choose a crop...</option>
                         </select>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Plant Day</label>
-                        <input type="number" id="plant-day" min="1" max="28" placeholder="1-28" required>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Plant Month</label>
+                            <select id="plant-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option value="">Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Plant Day</label>
+                            <input type="number" id="plant-day" min="1" max="28" placeholder="1-28" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Field Size (Hectares)</label>
+                        <input type="number" id="field-size" step="0.1" placeholder="Optional" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <input type="text" id="notes" placeholder="Optional notes..." 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Field Size (Hectares)</label>
-                    <input type="number" id="field-size" step="0.1" placeholder="Optional">
+
+                <div class="p-6 border-t flex space-x-3">
+                    <button onclick="hideAddForm()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="addField()" class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
+                        Add Field
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label>Notes</label>
-                    <input type="text" id="notes" placeholder="Optional notes...">
-                </div>
-            </form>
-            
-            <div class="modal-footer">
-                <button onclick="hideAddForm()" class="btn btn-secondary">Cancel</button>
-                <button onclick="addField()" class="btn btn-primary">Add Field</button>
             </div>
         </div>
     </div>
 
     <!-- Date Picker Modal -->
-    <div id="date-picker-modal" class="modal">
-        <div class="modal-backdrop" onclick="hideDatePicker()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Set Game Date</h2>
-                <button onclick="hideDatePicker()" class="modal-close">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Day</label>
-                        <input type="number" id="game-day" min="1" max="28" value="3">
+    <div id="date-picker-modal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="hideDatePicker()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm">
+                <div class="p-6 border-b">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Set Game Date</h3>
+                        <button onclick="hideDatePicker()" class="text-gray-400 hover:text-gray-600">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Month</label>
-                        <select id="game-month">
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Day</label>
+                        <input type="number" id="game-day" min="1" max="28" value="3" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                        <select id="game-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             <option value="1">January</option>
                             <option value="2">February</option>
                             <option value="3">March</option>
@@ -263,23 +297,39 @@
                             <option value="12">December</option>
                         </select>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Year</label>
-                        <input type="number" id="game-year" min="1" value="1">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                        <input type="number" id="game-year" min="1" value="1" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
                 </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button onclick="hideDatePicker()" class="btn btn-secondary">Cancel</button>
-                <button onclick="updateGameDate()" class="btn btn-primary">Update Date</button>
+
+                <div class="p-6 border-t flex space-x-3">
+                    <button onclick="hideDatePicker()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="updateGameDate()" class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
+                        Update
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Notification Container -->
-    <div id="notifications" class="notifications"></div>
+    <!-- Notification Toast -->
+    <div id="notification" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i id="notification-icon" class="w-5 h-5"></i>
+                </div>
+                <div class="ml-3">
+                    <p id="notification-message" class="text-sm font-medium text-gray-900"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

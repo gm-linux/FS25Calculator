@@ -12,7 +12,7 @@
     <!-- Top Header -->
     <header class="bg-white shadow-sm border-b">
         <div class="max-w-6xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between flex-wrap gap-4">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3">
                     <div class="bg-green-500 p-2 rounded-lg">
@@ -28,9 +28,9 @@
                 <div class="flex items-center space-x-4">
                     <div class="text-right">
                         <p class="text-sm text-gray-500">Current Game Date</p>
-                        <button onclick="showDatePicker()" class="font-semibold text-gray-900 hover:text-green-600 transition-colors">
+                        <button onclick="showDatePicker()" class="font-semibold text-gray-900 hover:text-green-600 transition-colors flex items-center gap-1">
                             <span id="current-game-date">Day 3, October, Year 1</span>
-                            <i data-lucide="edit-2" class="w-4 h-4 inline ml-1"></i>
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <button onclick="showAddForm()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
@@ -44,8 +44,8 @@
 
     <main class="max-w-6xl mx-auto px-6 py-8">
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
                 <div class="flex items-center">
                     <div class="bg-blue-100 p-3 rounded-lg">
                         <i data-lucide="map-pin" class="w-6 h-6 text-blue-600"></i>
@@ -57,7 +57,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-sm border">
+            <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
                 <div class="flex items-center">
                     <div class="bg-green-100 p-3 rounded-lg">
                         <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-sm border">
+            <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
                 <div class="flex items-center">
                     <div class="bg-yellow-100 p-3 rounded-lg">
                         <i data-lucide="clock" class="w-6 h-6 text-yellow-600"></i>
@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-sm border">
+            <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
                 <div class="flex items-center">
                     <div class="bg-orange-100 p-3 rounded-lg">
                         <i data-lucide="calendar" class="w-6 h-6 text-orange-600"></i>
@@ -153,7 +153,7 @@
         <!-- Crop Calendar -->
         <div class="bg-white rounded-xl shadow-sm border">
             <div class="p-6 border-b">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between flex-wrap gap-4">
                     <div class="flex items-center space-x-3">
                         <div class="bg-purple-100 p-2 rounded-lg">
                             <i data-lucide="calendar" class="w-5 h-5 text-purple-600"></i>
@@ -181,108 +181,35 @@
     </main>
 
     <!-- Add Field Modal -->
-    <div id="add-field-modal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="hideAddForm()"></div>
-        <div class="flex min-h-screen items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
-                <div class="p-6 border-b">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-gray-900">Add New Field</h3>
-                        <button onclick="hideAddForm()" class="text-gray-400 hover:text-gray-600">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Field Name</label>
-                        <input type="text" id="field-name" placeholder="e.g., North Field" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Crop Type</label>
-                        <select id="crop-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            <option value="">Choose a crop...</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Plant Month</label>
-                            <select id="plant-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <option value="">Month</option>
-                                <option value="1">January</option>
-                                <option value="2">February</option>
-                                <option value="3">March</option>
-                                <option value="4">April</option>
-                                <option value="5">May</option>
-                                <option value="6">June</option>
-                                <option value="7">July</option>
-                                <option value="8">August</option>
-                                <option value="9">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Plant Day</label>
-                            <input type="number" id="plant-day" min="1" max="28" placeholder="1-28" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Field Size (Hectares)</label>
-                        <input type="number" id="field-size" step="0.1" placeholder="Optional" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                        <input type="text" id="notes" placeholder="Optional notes..." 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    </div>
-                </div>
-
-                <div class="p-6 border-t flex space-x-3">
-                    <button onclick="hideAddForm()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
-                        Cancel
-                    </button>
-                    <button onclick="addField()" class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
-                        Add Field
-                    </button>
-                </div>
+    <div id="add-field-modal" class="modal">
+        <div class="modal-backdrop" onclick="hideAddForm()"></div>
+        <div class="modal-content">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Add New Field</h3>
+                <button onclick="hideAddForm()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
             </div>
-        </div>
-    </div>
-
-    <!-- Date Picker Modal -->
-    <div id="date-picker-modal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="hideDatePicker()"></div>
-        <div class="flex min-h-screen items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm">
-                <div class="p-6 border-b">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-gray-900">Set Game Date</h3>
-                        <button onclick="hideDatePicker()" class="text-gray-400 hover:text-gray-600">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
-                    </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Field Name</label>
+                    <input type="text" id="field-name" placeholder="e.g., North Field" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                 </div>
-                
-                <div class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Day</label>
-                        <input type="number" id="game-day" min="1" max="28" value="3" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Crop Type</label>
+                    <select id="crop-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <option value="">Choose a crop...</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
-                        <select id="game-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Plant Month</label>
+                        <select id="plant-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="">Month</option>
                             <option value="1">January</option>
                             <option value="2">February</option>
                             <option value="3">March</option>
@@ -292,41 +219,92 @@
                             <option value="7">July</option>
                             <option value="8">August</option>
                             <option value="9">September</option>
-                            <option value="10" selected>October</option>
+                            <option value="10">October</option>
                             <option value="11">November</option>
                             <option value="12">December</option>
                         </select>
                     </div>
-
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
-                        <input type="number" id="game-year" min="1" value="1" 
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Plant Day</label>
+                        <input type="number" id="plant-day" min="1" max="28" placeholder="1-28" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     </div>
                 </div>
 
-                <div class="p-6 border-t flex space-x-3">
-                    <button onclick="hideDatePicker()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
-                        Cancel
-                    </button>
-                    <button onclick="updateGameDate()" class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
-                        Update
-                    </button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Field Size (Hectares)</label>
+                    <input type="number" id="field-size" step="0.1" placeholder="Optional" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                    <input type="text" id="notes" placeholder="Optional notes..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <div class="p-6 border-t flex space-x-3">
+                <button onclick="hideAddForm()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+                    Cancel
+                </button>
+                <button onclick="addField()" class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
+                    Add Field
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="notification" class="fixed top-4 right-4 z-50 hidden">
-        <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <i id="notification-icon" class="w-5 h-5"></i>
+    <!-- Date Picker Modal -->
+    <div id="date-picker-modal" class="modal">
+        <div class="modal-backdrop" onclick="hideDatePicker()"></div>
+        <div class="modal-content">
+            <div class="p-6 border-b flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Set Game Date</h3>
+                <button onclick="hideDatePicker()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Day</label>
+                    <input type="number" id="game-day" min="1" max="28" value="3" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                 </div>
-                <div class="ml-3">
-                    <p id="notification-message" class="text-sm font-medium text-gray-900"></p>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                    <select id="game-month" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10" selected>October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                    <input type="number" id="game-year" min="1" value="1" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <div class="p-6 border-t flex space-x-3">
+                <button onclick="hideDatePicker()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+                    Cancel
+                </button>
+                <button onclick="updateGameDate()" class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
+                    Update
+                </button>
             </div>
         </div>
     </div>

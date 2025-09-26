@@ -1,5 +1,5 @@
 /**
- * FS25 Crop Calculator - Modern JavaScript
+ * FS25 Crop Calculator - Fixed JavaScript
  */
 
 // Game state
@@ -186,8 +186,8 @@ function daysToGameDate(totalDays) {
     return { day, month, year };
 }
 
-function calculateHarvestDate(plantDay, plantMonth, cropType) {
-    const plantTotalDays = gameDataToDays(plantDay, plantMonth, currentGameDate.year);
+function calculateHarvestDate(plantDay, plantMonth, plantYear, cropType) {
+    const plantTotalDays = gameDataToDays(plantDay, plantMonth, plantYear);
     const growthTimeInDays = cropData[cropType].growthTime * 28;
     const harvestTotalDays = plantTotalDays + growthTimeInDays;
     return daysToGameDate(harvestTotalDays);
@@ -218,7 +218,7 @@ function updateGameDateDisplay() {
     }
     
     if (seasonElement) {
-        seasonElement.textContent = seasons[currentGameDate.month];
+        seasonElement.textContent = seasons[currentGameDate.month] || 'Unknown';
     }
 }
 
@@ -331,33 +331,31 @@ function updateFieldsList() {
         }
 
         return `
-            <div class="field-item">
-                <div class="field-header">
-                    <div class="field-info">
-                        <div class="field-emoji">${cropData[field.cropType].icon}</div>
-                        <div class="field-details">
-                            <h4>${field.fieldName}</h4>
-                            <div class="field-status ${statusClass}">${statusText}</div>
+            <div class="p-6 border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl">${cropData[field.cropType]?.icon || '🌱'}</div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900">${field.fieldName}</h4>
+                            <div class="${statusClass}">${statusText}</div>
                         </div>
                     </div>
-                    <div class="field-actions">
-                        <button class="action-btn delete" onclick="removeField(${field.id})" title="Remove field">
-                            <i data-lucide="trash-2"></i>
-                        </button>
-                    </div>
+                    <button onclick="removeField(${field.id})" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Remove field">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
                 </div>
-                <div class="field-meta">
-                    <div class="meta-item">
-                        <strong>Crop:</strong> ${field.cropType}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div>
+                        <strong class="text-gray-900">Crop:</strong> ${field.cropType}
                         ${field.fieldSize ? ` • ${field.fieldSize} ha` : ''}
                     </div>
-                    <div class="meta-item">
-                        <strong>Planted:</strong> Day ${field.plantDate.day}, ${monthNames[field.plantDate.month]}
+                    <div>
+                        <strong class="text-gray-900">Planted:</strong> Day ${field.plantDate.day}, ${monthNames[field.plantDate.month]}
                     </div>
-                    <div class="meta-item">
-                        <strong>Harvest:</strong> Day ${field.harvestDate.day}, ${monthNames[field.harvestDate.month]}
+                    <div>
+                        <strong class="text-gray-900">Harvest:</strong> Day ${field.harvestDate.day}, ${monthNames[field.harvestDate.month]}, Year ${field.harvestDate.year}
                     </div>
-                    ${field.notes ? `<div class="meta-item"><strong>Notes:</strong> ${field.notes}</div>` : ''}
+                    ${field.notes ? `<div class="col-span-full"><strong class="text-gray-900">Notes:</strong> ${field.notes}</div>` : ''}
                 </div>
             </div>
         `;
@@ -389,7 +387,7 @@ function createCropCalendar() {
         const data = cropData[crop];
         calendarHTML += `
             <div class="calendar-row">
-                <div class="crop-name">
+                <div class="crop-name-cell">
                     <span class="crop-icon">${data.icon}</span>
                     <span>${crop}</span>
                 </div>
@@ -431,9 +429,21 @@ function showAddForm() {
         const plantDay = document.getElementById('plant-day');
         const fieldName = document.getElementById('field-name');
         
-        if (plantMonth) plantMonth.value = currentGameDate.month;
-        if (plantDay) plantDay.value = currentGameDate.day;
-        if (fieldName) fieldName.focus();
+        if (plantMonth) plantMonth.value = currentGameDate.month.toString();
+        if (plantDay) plantDay.value = currentGameDate.day.toString();
+        if (fieldName) {
+            fieldName.value = '';
+            setTimeout(() => fieldName.focus(), 100);
+        }
+        
+        // Reset other fields
+        const cropType = document.getElementById('crop-type');
+        const fieldSize = document.getElementById('field-size');
+        const notes = document.getElementById('notes');
+        
+        if (cropType) cropType.value = '';
+        if (fieldSize) fieldSize.value = '';
+        if (notes) notes.value = '';
     }
 }
 
@@ -441,10 +451,6 @@ function hideAddForm() {
     const modal = document.getElementById('add-field-modal');
     if (modal) {
         modal.classList.remove('show');
-        
-        // Reset form
-        const form = modal.querySelector('form');
-        if (form) form.reset();
     }
 }
 
@@ -458,9 +464,9 @@ function showDatePicker() {
         const monthInput = document.getElementById('game-month');
         const yearInput = document.getElementById('game-year');
         
-        if (dayInput) dayInput.value = currentGameDate.day;
-        if (monthInput) monthInput.value = currentGameDate.month;
-        if (yearInput) yearInput.value = currentGameDate.year;
+        if (dayInput) dayInput.value = currentGameDate.day.toString();
+        if (monthInput) monthInput.value = currentGameDate.month.toString();
+        if (yearInput) yearInput.value = currentGameDate.year.toString();
     }
 }
 
@@ -477,9 +483,29 @@ function updateGameDate() {
     const yearInput = document.getElementById('game-year');
     
     if (dayInput && monthInput && yearInput) {
-        currentGameDate.day = parseInt(dayInput.value) || 1;
-        currentGameDate.month = parseInt(monthInput.value) || 1;
-        currentGameDate.year = parseInt(yearInput.value) || 1;
+        const newDay = parseInt(dayInput.value) || 1;
+        const newMonth = parseInt(monthInput.value) || 1;
+        const newYear = parseInt(yearInput.value) || 1;
+        
+        // Validation
+        if (newDay < 1 || newDay > 28) {
+            showNotification('Day must be between 1 and 28', 'error');
+            return;
+        }
+        
+        if (newMonth < 1 || newMonth > 12) {
+            showNotification('Invalid month selected', 'error');
+            return;
+        }
+        
+        if (newYear < 1) {
+            showNotification('Year must be 1 or greater', 'error');
+            return;
+        }
+        
+        currentGameDate.day = newDay;
+        currentGameDate.month = newMonth;
+        currentGameDate.year = newYear;
         
         saveData();
         updateAllDisplays();
@@ -511,17 +537,37 @@ function addField() {
     const notes = notesEl ? notesEl.value.trim() : '';
 
     // Validation
-    if (!fieldName || !cropType || !plantMonth || !plantDay) {
-        showNotification('Please fill in all required fields', 'error');
+    if (!fieldName) {
+        showNotification('Please enter a field name', 'error');
+        fieldNameEl.focus();
+        return;
+    }
+
+    if (!cropType) {
+        showNotification('Please select a crop type', 'error');
+        cropTypeEl.focus();
+        return;
+    }
+
+    if (!plantMonth || plantMonth < 1 || plantMonth > 12) {
+        showNotification('Please select a valid plant month', 'error');
+        plantMonthEl.focus();
+        return;
+    }
+
+    if (!plantDay || plantDay < 1 || plantDay > 28) {
+        showNotification('Please enter a valid plant day (1-28)', 'error');
+        plantDayEl.focus();
         return;
     }
 
     if (fields.some(field => field.fieldName.toLowerCase() === fieldName.toLowerCase())) {
         showNotification('A field with this name already exists', 'error');
+        fieldNameEl.focus();
         return;
     }
 
-    const harvestDate = calculateHarvestDate(plantDay, plantMonth, cropType);
+    const harvestDate = calculateHarvestDate(plantDay, plantMonth, currentGameDate.year, cropType);
     
     const field = {
         id: Date.now(),
@@ -561,6 +607,7 @@ function saveData() {
         localStorage.setItem('fs25Calculator', JSON.stringify(data));
     } catch (error) {
         console.error('Error saving data:', error);
+        showNotification('Error saving data', 'error');
     }
 }
 
@@ -569,11 +616,16 @@ function loadData() {
         const saved = localStorage.getItem('fs25Calculator');
         if (saved) {
             const data = JSON.parse(saved);
-            currentGameDate = data.currentGameDate || currentGameDate;
-            fields = data.fields || [];
+            if (data.currentGameDate) {
+                currentGameDate = data.currentGameDate;
+            }
+            if (data.fields && Array.isArray(data.fields)) {
+                fields = data.fields;
+            }
         }
     } catch (error) {
         console.error('Error loading data:', error);
+        showNotification('Error loading saved data', 'error');
     }
 }
 
@@ -592,13 +644,19 @@ function populateCropSelect() {
 }
 
 function showNotification(message, type = 'info') {
-    const container = document.getElementById('notifications') || document.body;
+    // Remove any existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    });
     
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
     
-    container.appendChild(notification);
+    document.body.appendChild(notification);
     
     // Auto remove after 4 seconds
     setTimeout(() => {
@@ -606,7 +664,9 @@ function showNotification(message, type = 'info') {
             notification.style.opacity = '0';
             notification.style.transform = 'translateX(100%)';
             setTimeout(() => {
-                notification.parentNode.removeChild(notification);
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
             }, 300);
         }
     }, 4000);
@@ -620,6 +680,14 @@ function updateAllDisplays() {
     updateFieldsList();
     createCropCalendar();
 }
+
+// Event Listeners
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideAddForm();
+        hideDatePicker();
+    }
+});
 
 // Initialize app
 function init() {

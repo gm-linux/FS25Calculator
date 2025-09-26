@@ -812,6 +812,39 @@ function updateAllDisplays() {
     populateCropSelect(); // Re-populate to show correct time units
 }
 
+// Increment/Decrement Game Day
+function incrementGameDay(amount) {
+    let { day, month, year } = currentGameDate;
+    const daysPerMonth = gameSettings.daysPerMonth;
+
+    day += amount;
+
+    while (day > daysPerMonth) {
+        day -= daysPerMonth;
+        month += 1;
+        if (month > 12) {
+            month = 1;
+            year += 1;
+        }
+    }
+    while (day < 1) {
+        month -= 1;
+        if (month < 1) {
+            month = 12;
+            year -= 1;
+            if (year < 1) year = 1;
+        }
+        day += daysPerMonth;
+    }
+
+    currentGameDate.day = day;
+    currentGameDate.month = month;
+    currentGameDate.year = year;
+
+    saveData();
+    updateAllDisplays();
+}
+
 // Event Listeners
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {

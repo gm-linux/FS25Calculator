@@ -28,10 +28,18 @@
                 <div class="flex items-center space-x-4">
                     <div class="text-right">
                         <p class="text-sm text-gray-500">Current Game Date</p>
-                        <button onclick="showDatePicker()" class="font-semibold text-gray-900 hover:text-green-600 transition-colors flex items-center gap-1">
-                            <span id="current-game-date">Day 3, October, Year 1</span>
-                            <i data-lucide="edit-2" class="w-4 h-4"></i>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="incrementGameDay(-1)" title="Previous Day" class="bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded transition-colors">
+                                <i data-lucide="minus" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="showDatePicker()" class="font-semibold text-gray-900 hover:text-green-600 transition-colors flex items-center gap-1">
+                                <span id="current-game-date">Day 3, October, Year 1</span>
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="incrementGameDay(1)" title="Next Day" class="bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                         <p class="text-xs text-gray-400 mt-1">
                             <span id="days-per-month-display">28</span> days/month
                         </p>

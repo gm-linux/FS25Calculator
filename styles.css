@@ -382,10 +382,18 @@ select {
 }
 
 /* Fix field hover: prevent bright hover on field rows */
+#fields-container > .p-6,
 #fields-container > .p-6:hover {
     background: #23232b !important;
     color: #f3f4f6 !important;
+    border-color: #3f3f46 !important;
     transition: background 0.2s;
+}
+
+/* Remove Tailwind's light hover from field rows */
+#fields-container > .p-6:hover .text-gray-900,
+#fields-container > .p-6:hover .text-gray-600 {
+    color: #f3f4f6 !important;
 }
 
 /* Action Buttons */

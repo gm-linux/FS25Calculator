@@ -261,6 +261,8 @@ function updateGameDateDisplay() {
  */
 function updatePlantingRecommendations() {
     const container = document.getElementById('planting-recommendations');
+    if (!container) return; // Safety check
+    
     const canPlant = Object.keys(cropData).filter(isPlantingSeason);
     
     if (canPlant.length === 0) {
@@ -282,6 +284,8 @@ function updatePlantingRecommendations() {
  */
 function updateHarvestRecommendations() {
     const container = document.getElementById('harvest-recommendations');
+    if (!container) return; // Safety check
+    
     const canHarvest = Object.keys(cropData).filter(isHarvestSeason);
     
     if (canHarvest.length === 0) {
@@ -423,44 +427,74 @@ function createCropCalendar() {
 // ========================================
 
 function showAddForm() {
-    document.getElementById('add-field-modal').classList.remove('hidden');
-    document.getElementById('add-field-modal').classList.add('flex');
+    const modal = document.getElementById('add-field-modal');
+    const plantMonth = document.getElementById('plant-month');
+    const plantDay = document.getElementById('plant-day');
+    const fieldName = document.getElementById('field-name');
+    
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
     
     // Set current month as default
-    document.getElementById('plant-month').value = currentGameDate.month;
-    document.getElementById('plant-day').value = currentGameDate.day;
-    
-    document.getElementById('field-name').focus();
+    if (plantMonth) plantMonth.value = currentGameDate.month;
+    if (plantDay) plantDay.value = currentGameDate.day;
+    if (fieldName) fieldName.focus();
 }
 
 function hideAddForm() {
-    document.getElementById('add-field-modal').classList.add('hidden');
-    document.getElementById('add-field-form').reset();
+    const modal = document.getElementById('add-field-modal');
+    const form = document.getElementById('add-field-form');
+    
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    
+    if (form) form.reset();
 }
 
 function showDatePicker() {
-    document.getElementById('date-picker-modal').classList.remove('hidden');
-    document.getElementById('date-picker-modal').classList.add('flex');
+    const modal = document.getElementById('date-picker-modal');
+    const dayInput = document.getElementById('game-day');
+    const monthInput = document.getElementById('game-month');
+    const yearInput = document.getElementById('game-year');
     
-    document.getElementById('game-day').value = currentGameDate.day;
-    document.getElementById('game-month').value = currentGameDate.month;
-    document.getElementById('game-year').value = currentGameDate.year;
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    
+    if (dayInput) dayInput.value = currentGameDate.day;
+    if (monthInput) monthInput.value = currentGameDate.month;
+    if (yearInput) yearInput.value = currentGameDate.year;
 }
 
 function hideDatePicker() {
-    document.getElementById('date-picker-modal').classList.add('hidden');
+    const modal = document.getElementById('date-picker-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 function updateGameDate() {
-    currentGameDate.day = parseInt(document.getElementById('game-day').value);
-    currentGameDate.month = parseInt(document.getElementById('game-month').value);
-    currentGameDate.year = parseInt(document.getElementById('game-year').value);
+    const dayInput = document.getElementById('game-day');
+    const monthInput = document.getElementById('game-month');
+    const yearInput = document.getElementById('game-year');
     
-    saveData();
-    updateDisplay();
-    hideDatePicker();
-    
-    showNotification('Game date updated successfully!', 'success');
+    if (dayInput && monthInput && yearInput) {
+        currentGameDate.day = parseInt(dayInput.value) || 1;
+        currentGameDate.month = parseInt(monthInput.value) || 1;
+        currentGameDate.year = parseInt(yearInput.value) || 1;
+        
+        saveData();
+        updateDisplay();
+        hideDatePicker();
+        
+        showNotification('Game date updated successfully!', 'success');
+    }
 }
 
 // ========================================
@@ -468,12 +502,24 @@ function updateGameDate() {
 // ========================================
 
 function addField() {
-    const fieldName = document.getElementById('field-name').value.trim();
-    const cropType = document.getElementById('crop-type').value;
-    const plantMonth = parseInt(document.getElementById('plant-month').value);
-    const plantDay = parseInt(document.getElementById('plant-day').value);
-    const fieldSize = parseFloat(document.getElementById('field-size').value) || null;
-    const notes = document.getElementById('notes').value.trim();
+    const fieldNameEl = document.getElementById('field-name');
+    const cropTypeEl = document.getElementById('crop-type');
+    const plantMonthEl = document.getElementById('plant-month');
+    const plantDayEl = document.getElementById('plant-day');
+    const fieldSizeEl = document.getElementById('field-size');
+    const notesEl = document.getElementById('notes');
+
+    if (!fieldNameEl || !cropTypeEl || !plantMonthEl || !plantDayEl) {
+        console.error('Form elements not found');
+        return;
+    }
+
+    const fieldName = fieldNameEl.value.trim();
+    const cropType = cropTypeEl.value;
+    const plantMonth = parseInt(plantMonthEl.value);
+    const plantDay = parseInt(plantDayEl.value);
+    const fieldSize = fieldSizeEl ? parseFloat(fieldSizeEl.value) || null : null;
+    const notes = notesEl ? notesEl.value.trim() : '';
 
     if (!fieldName || !cropType || !plantMonth || !plantDay) {
         alert('Please fill in all required fields.');

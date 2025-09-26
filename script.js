@@ -219,27 +219,33 @@ function isHarvestSeason(cropType) {
 
 // Game Settings Functions
 function onDaysPerMonthChange() {
-    const select = document.getElementById('days-per-month');
-    if (!select) return;
-    
+    const input = document.getElementById('days-per-month');
+    if (!input) return;
+
+    let newDaysPerMonth = parseInt(input.value);
+    if (isNaN(newDaysPerMonth) || newDaysPerMonth < 1 || newDaysPerMonth > 99) {
+        showNotification('Days per month must be between 1 and 99', 'error');
+        input.value = gameSettings.daysPerMonth;
+        return;
+    }
+
     const oldDaysPerMonth = gameSettings.daysPerMonth;
-    const newDaysPerMonth = parseInt(select.value);
-    
+
     if (newDaysPerMonth !== oldDaysPerMonth) {
         gameSettings.daysPerMonth = newDaysPerMonth;
-        
+
         // Update max day validation for current day input
         updateDayInputValidation();
-        
+
         // Recalculate all harvest dates
         recalculateAllHarvestDates();
-        
+
         // Update display
         updateDaysPerMonthDisplay();
-        
+
         // Save settings
         saveData();
-        
+
         showNotification(`Days per month updated to ${newDaysPerMonth}. All harvest dates recalculated.`, 'info');
     }
 }
@@ -247,14 +253,14 @@ function onDaysPerMonthChange() {
 function updateDayInputValidation() {
     const dayInput = document.getElementById('game-day');
     const plantDayInput = document.getElementById('plant-day');
-    
+
     if (dayInput) {
         dayInput.max = gameSettings.daysPerMonth.toString();
         if (parseInt(dayInput.value) > gameSettings.daysPerMonth) {
             dayInput.value = gameSettings.daysPerMonth.toString();
         }
     }
-    
+
     if (plantDayInput) {
         plantDayInput.max = gameSettings.daysPerMonth.toString();
         plantDayInput.placeholder = `1-${gameSettings.daysPerMonth}`;
@@ -547,13 +553,13 @@ function showDatePicker() {
     const modal = document.getElementById('date-picker-modal');
     if (modal) {
         modal.classList.add('show');
-        
+
         // Set current values
         const dayInput = document.getElementById('game-day');
         const monthInput = document.getElementById('game-month');
         const yearInput = document.getElementById('game-year');
         const daysPerMonthInput = document.getElementById('days-per-month');
-        
+
         if (dayInput) {
             dayInput.value = currentGameDate.day.toString();
             dayInput.max = gameSettings.daysPerMonth.toString();
@@ -576,44 +582,50 @@ function updateGameDate() {
     const monthInput = document.getElementById('game-month');
     const yearInput = document.getElementById('game-year');
     const daysPerMonthInput = document.getElementById('days-per-month');
-    
+
     if (dayInput && monthInput && yearInput && daysPerMonthInput) {
         const newDay = parseInt(dayInput.value) || 1;
         const newMonth = parseInt(monthInput.value) || 1;
         const newYear = parseInt(yearInput.value) || 1;
         const newDaysPerMonth = parseInt(daysPerMonthInput.value) || 28;
-        
+
         // Validation
+        if (newDaysPerMonth < 1 || newDaysPerMonth > 99) {
+            showNotification('Days per month must be between 1 and 99', 'error');
+            daysPerMonthInput.value = gameSettings.daysPerMonth;
+            return;
+        }
+
         if (newDay < 1 || newDay > newDaysPerMonth) {
             showNotification(`Day must be between 1 and ${newDaysPerMonth}`, 'error');
             return;
         }
-        
+
         if (newMonth < 1 || newMonth > 12) {
             showNotification('Invalid month selected', 'error');
             return;
         }
-        
+
         if (newYear < 1) {
             showNotification('Year must be 1 or greater', 'error');
             return;
         }
-        
+
         // Update days per month if changed
         const daysPerMonthChanged = newDaysPerMonth !== gameSettings.daysPerMonth;
         if (daysPerMonthChanged) {
             gameSettings.daysPerMonth = newDaysPerMonth;
             recalculateAllHarvestDates();
         }
-        
+
         currentGameDate.day = newDay;
         currentGameDate.month = newMonth;
         currentGameDate.year = newYear;
-        
+
         saveData();
         updateAllDisplays();
         hideDatePicker();
-        
+
         if (daysPerMonthChanged) {
             showNotification('Game date and days per month updated! All harvest dates recalculated.', 'success');
         } else {
@@ -745,16 +757,16 @@ function loadData() {
 function populateCropSelect() {
     const select = document.getElementById('crop-type');
     if (!select) return;
-    
+
     select.innerHTML = '<option value="">Choose a crop...</option>';
-    
+
     Object.keys(cropData).sort().forEach(crop => {
         const option = document.createElement('option');
         option.value = crop;
         const timeUnit = gameSettings.daysPerMonth === 1 ? 'days' : 'months';
-        const timeValue = gameSettings.daysPerMonth === 1 ? 
-                         cropData[crop].growthTime * gameSettings.daysPerMonth : 
-                         cropData[crop].growthTime;
+        const timeValue = gameSettings.daysPerMonth === 1 ?
+            cropData[crop].growthTime * gameSettings.daysPerMonth :
+            cropData[crop].growthTime;
         option.textContent = `${cropData[crop].icon} ${crop} (${timeValue} ${timeUnit})`;
         select.appendChild(option);
     });

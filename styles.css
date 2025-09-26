@@ -390,10 +390,18 @@ select {
     color: #f3f4f6 !important;
     border-color: #3f3f46 !important;
     box-shadow: none !important;
+    filter: none !important;
     transition: none !important;
 }
 
-/* Force all text inside field rows to stay light on hover */
+/* Also override any .hover\:bg-gray-50 or .hover\:bg-white from Tailwind on descendants */
+#fields-container > .p-6:hover,
+#fields-container > .p-6:focus,
+#fields-container > .p-6:active {
+    background: #23232b !important;
+    background-color: #23232b !important;
+}
+
 #fields-container > .p-6 *,
 #fields-container > .p-6:hover *,
 #fields-container > .p-6:focus *,
@@ -403,15 +411,9 @@ select {
     box-shadow: none !important;
 }
 
-/* Remove Tailwind's light hover and shadow from field rows */
-#fields-container > .p-6:hover,
-#fields-container > .p-6:focus,
-#fields-container > .p-6:active {
-    filter: none !important;
-    background: #23232b !important;
-    color: #f3f4f6 !important;
+/* Remove any border or background from hover on the border itself */
+#fields-container > .p-6 {
     border-color: #3f3f46 !important;
-    box-shadow: none !important;
 }
 
 /* Action Buttons */

@@ -487,6 +487,7 @@ function updateFieldsList() {
             </div>
         `;
 
+        // --- Add Edit and Delete buttons here ---
         return `
             <div class="p-6 border-b border-gray-200 hover:bg-gray-50 transition-colors">
                 <div class="flex items-center justify-between mb-4">
@@ -497,9 +498,14 @@ function updateFieldsList() {
                             <div class="${statusClass}">${statusText}</div>
                         </div>
                     </div>
-                    <button onclick="removeField(${field.id})" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Remove field">
-                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="editField(${field.id})" class="action-btn" title="Edit field">
+                            <i data-lucide="edit-2" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="removeField(${field.id})" class="action-btn delete" title="Remove field">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                     <div>

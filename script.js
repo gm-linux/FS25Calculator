@@ -996,3 +996,11 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+// Add this function to fix the missing showDatePicker error
+function showDatePicker() {
+    const modal = document.getElementById('date-picker-modal');
+    if (modal) {
+        modal.classList.add('show');
+    }
+}
